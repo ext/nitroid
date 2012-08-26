@@ -7,30 +7,51 @@ var nitroid = new function() {
 		var height = 0;
 		var horizontal_tiles = 0;
 		var vertical_tiles = 0;
-		var tile_width = 16;
-		var tile_height = 16;
-		var depth = 0;
+		var tile_width = 32;
+		var tile_height = 32;
+		var depth = 1.0;
 		var key = [];
 
 		/* fps control */
-		var fps = 25;
+		var fps = 30;
 		var frame_delay = 1000 / fps;
 		var dt = 1.0 / fps;
 
-		var TILE_EMPTY = 0;
+		var TILE_EMPTY = -1;
+		var TILE_PLATFORM = 0;
+		var TILE_WALL = 7;
 		var KEY_UP = 38;
 		var KEY_DOWN = 40;
 
-		var tile_at = function(x, y){
-				if ( y % 12 != 0 ) return TILE_EMPTY;
+		var wall_width = function(y){
+				var d = Math.sin(y * 0.05) * Math.atan(y * 0.15 + 7) * 5 + Math.cos(y * 0.5 + 11) * 1.1;
+				return Math.abs(d);
+		}
 
-				var i = y * horizontal_tiles + x;
-				return 1;
+		var tile_at = function(x, y){
+				var w1 = wall_width(y);
+				var w2 = wall_width(y+1337)+1;
+
+				var is_wall = x < w1 || x >= (horizontal_tiles-w2);
+				var is_row = y % 12 == 0;
+
+				if ( is_wall ){
+						return TILE_WALL;
+				}
+
+				if ( is_row ){
+						return TILE_PLATFORM;
+				}
+
+				return TILE_EMPTY;
 		}
 
 		var update = function(){
-				if ( key[38] ) depth -= 12.0 * dt;
-				if ( key[40] ) depth += 12.0 * dt;
+				if ( key[KEY_UP  ] ) depth -= 40.0 * dt;
+				if ( key[KEY_DOWN] ) depth += 40.0 * dt;
+
+				/* cannot be hight that this */
+				if ( depth < 1.0 ) depth = 1.0;
 		};
 
 		var render = function(){
@@ -45,11 +66,12 @@ var nitroid = new function() {
 								var tile = tile_at(x, ty);
 								if ( tile == TILE_EMPTY ) continue;
 
+								var sx = tile * tile_width;
 								context.drawImage(tileset,
-																	0, 0,
-																	16, 16,
-																	x * tile_width, (y-offset) * tile_height,
-																	tile_width, tile_height);
+								                  sx, 0,
+								                  tile_width, tile_height,
+								                  x * tile_width, (y-offset) * tile_height,
+								                  tile_width, tile_height);
 						}
 				}
 		};
@@ -59,9 +81,13 @@ var nitroid = new function() {
 		 * Return true if the key was handled.
 		 */
 		var key_handler = function(code, state){
+				/* normalize wasd to arrows */
+				if ( code == 83 ) code = KEY_DOWN;
+				if ( code == 87 ) code = KEY_UP;
+
 				switch ( code ){
-				case 38:
-				case 40:
+				case KEY_UP:
+				case KEY_DOWN:
 						key[code] = state;
 						break;
 
