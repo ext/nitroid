@@ -4,6 +4,9 @@ var nitroid = new function() {
 		var context = null;
 		var tileset = new Image();
 
+		/* parameters */
+		var platform_height = 12;      /* height between platforms */
+
 		var width = 0;
 		var height = 0;
 		var horizontal_tiles = 0;
@@ -45,7 +48,7 @@ var nitroid = new function() {
 				var w2 = wall_width(y+1337);
 
 				var is_wall = x < w1 || x >= (horizontal_tiles-w2);
-				var is_row = y % 12 == 0;
+				var is_row = y % platform_height == 0;
 
 				if ( is_wall ){
 						return TILE_WALL + Math.floor(frand(y*52 + x*19) * 6);
@@ -173,7 +176,7 @@ var nitroid = new function() {
 		};
 
 		return {
-				init: function(id){
+				init: function(id, params){
 						/* not using jquery since it is significantly slower when it comes to canvas rendering */
 						canvas = document.getElementById(id);
 						context = canvas.getContext('2d');
@@ -205,11 +208,17 @@ var nitroid = new function() {
 								.css('height', height)
 						;
 
+						/* setup parameters */
+						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
+
+						/* start game */
 						setInterval(expire, frame_delay);
 				},
 		};
 }();
 
 $(document).ready(function(){
-		nitroid.init('nitroid');
+		nitroid.init('nitroid', {
+				'platform_height': 8
+		});
 });
