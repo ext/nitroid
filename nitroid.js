@@ -1,4 +1,5 @@
 var nitroid = new function() {
+		var wrapper = null;
 		var canvas = null;
 		var context = null;
 		var tileset = new Image();
@@ -109,6 +110,7 @@ var nitroid = new function() {
 
 		var render = function(){
 				context.clearRect (0, 0, width, height);
+				wrapper.style.backgroundPosition = '0 ' + (-depth * tile_height * 0.5) + 'px';
 
 				/* offset in y-axis for in-tile scrolling */
 				var offset = (depth - Math.floor(depth));
@@ -190,8 +192,18 @@ var nitroid = new function() {
 								key.push(false);
 						}
 
-						/* preload tileset */
-						tileset.src = 'tileset.jpg';
+						/* preload graphics */
+						tileset.src = 'tileset.png';
+
+						/* apply background */
+						wrapper = canvas.parentNode;
+						$(wrapper)
+								.css('background', '#000')
+								.css('background-image', 'url("cave.jpg")')
+								.css('background-position', '0 0')
+								.css('width', width)
+								.css('height', height)
+						;
 
 						setInterval(expire, frame_delay);
 				},
