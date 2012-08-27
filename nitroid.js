@@ -12,6 +12,10 @@ var nitroid = new function() {
 		var depth = 1.0;
 		var key = [];
 
+		/* level data */
+		var map = [];       /* row, column */
+		var map_begin = -1; /* first row in cache */
+
 		/* fps control */
 		var fps = 30;
 		var frame_delay = 1000 / fps;
@@ -23,6 +27,7 @@ var nitroid = new function() {
 		var KEY_UP = 38;
 		var KEY_DOWN = 40;
 
+		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
 				return Math.sin(v*429384) * Math.cos(v*17493340) * 0.5 + 0.5;
 		}
@@ -64,6 +69,27 @@ var nitroid = new function() {
 
 				/* cannot be hight that this */
 				if ( depth < 1.0 ) depth = 1.0;
+
+				update_map();
+		};
+
+		/**
+		 * Recalculates the map cache if necessary.
+		 */
+		var update_map = function(){
+				var d = Math.floor(depth);
+				if ( d == map_begin ) return;
+
+				var w = Math.ceil(horizontal_tiles);
+				map.length = 0;
+				for ( var y = 0; y < vertical_tiles + 1; y++ ){
+						var row = new Array(w);
+						for ( var x = 0; x < w; x++ ){
+								row[x] = tile_at(x, y + d);
+						}
+						map.push(row)
+				}
+				map_begin = d;
 		};
 
 		var render = function(){
@@ -75,7 +101,7 @@ var nitroid = new function() {
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
 						var ty = y + Math.floor(depth);
 						for ( var x = 0; x < horizontal_tiles; x++ ){
-								var tile = tile_at(x, ty);
+								var tile = map[y][x];
 								if ( tile == TILE_EMPTY ) continue;
 
 								var sx = (tile % 8) * tile_width;
