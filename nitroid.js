@@ -25,6 +25,7 @@ var nitroid = new function() {
 		var frame_delay = 1000 / fps;
 		var dt = 1.0 / fps;
 
+		/* constants */
 		var TILE_EMPTY = -1;
 		var TILE_PLATFORM = 0;
 		var TILE_WALL = 18;
@@ -55,12 +56,15 @@ var nitroid = new function() {
 				}
 
 				if ( is_row ){
+						/* Use platform tiles in an incremental way */
 						var t = TILE_PLATFORM + (x - w1) % 7;
 
+						/* Locate opening for platform */
 						var width = horizontal_tiles - w1 - w2 - 1;
 						var size = Math.ceil(Math.abs(Math.sin(y * 4711)) * 3) + 3;
 						var pos = w1 + Math.floor(Math.abs(Math.cos(y * 1234)) * (width-6));
 						if ( x > pos && x < pos + size ){
+								/* Randomize between destroyable and empty hole */
 								return frand(y) > 0.8 ? TILE_EMPTY : (t+8);
 						}
 						return t;
@@ -73,7 +77,7 @@ var nitroid = new function() {
 				if ( key[KEY_UP  ] ) depth -= 40.0 * dt;
 				if ( key[KEY_DOWN] ) depth += 40.0 * dt;
 
-				/* cannot be hight that this */
+				/* cannot go higher than this */
 				if ( depth < 1.0 ) depth = 1.0;
 
 				update_map();
