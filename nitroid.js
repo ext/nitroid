@@ -44,6 +44,9 @@ var nitroid = new function() {
 				return Math.ceil(Math.abs(d));
 		}
 
+		/**
+		 * Tell what tile is at the given coordinate.
+		 */
 		var tile_at = function(x, y){
 				var w1 = wall_width(y);
 				var w2 = wall_width(y+1337);
@@ -115,11 +118,16 @@ var nitroid = new function() {
 				map_begin = d;
 		};
 
-		var render = function(){
+		var render_clear = function(){
 				context.clearRect (0, 0, width, height);
-				wrapper.style.backgroundPosition = '0 ' + (-depth * tile_height * 0.5) + 'px';
+		}
 
-				/* offset in y-axis for in-tile scrolling */
+		var render_background = function(){
+				wrapper.style.backgroundPosition = '0 ' + (-depth * tile_height * 0.5) + 'px';
+		}
+
+		var render_map = function(){
+				/* offset in y-axis for in-tile scrolling ("pixelperfect") */
 				var offset = (depth - Math.floor(depth));
 
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
@@ -137,6 +145,13 @@ var nitroid = new function() {
 								                  tile_width, tile_height);
 						}
 				}
+
+		}
+
+		var render = function(){
+				render_clear();
+				render_background();
+				render_map();
 		};
 
 		/**
