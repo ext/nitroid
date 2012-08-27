@@ -131,18 +131,20 @@ var nitroid = new function() {
 				var offset = (depth - Math.floor(depth));
 
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
-						var ty = y + Math.floor(depth);
+						var py = (y-offset) * tile_height;
+
 						for ( var x = 0; x < horizontal_tiles; x++ ){
 								var tile = map[y][x];
 								if ( tile == TILE_EMPTY ) continue;
 
 								var sx = (tile % 8) * tile_width;
 								var sy = Math.floor(tile / 8) * tile_height;
+								var px = x * tile_width;
 								context.drawImage(tileset,
-								                  sx, sy,
-								                  tile_width, tile_height,
-								                  x * tile_width, (y-offset) * tile_height,
-								                  tile_width, tile_height);
+								                  sx, sy,                   /* src */
+								                  tile_width, tile_height,  /* src size */
+								                  px, py,                   /* dst */
+								                  tile_width, tile_height); /* dst size */
 						}
 				}
 
