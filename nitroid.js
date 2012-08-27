@@ -23,7 +23,9 @@ var nitroid = new function() {
 
 		var TILE_EMPTY = -1;
 		var TILE_PLATFORM = 0;
-		var TILE_WALL = 7;
+		var TILE_WALL = 18;
+		var TILE_EDGE_RIGHT = 17;
+		var TILE_EDGE_LEFT = 16;
 		var KEY_UP = 38;
 		var KEY_DOWN = 40;
 
@@ -45,7 +47,7 @@ var nitroid = new function() {
 				var is_row = y % 12 == 0;
 
 				if ( is_wall ){
-						return TILE_WALL;
+						return TILE_WALL + Math.floor(frand(y*52 + x*19) * 6);
 				}
 
 				if ( is_row ){
@@ -84,9 +86,22 @@ var nitroid = new function() {
 				map.length = 0;
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
 						var row = new Array(w);
+
+						/* raw values */
 						for ( var x = 0; x < w; x++ ){
 								row[x] = tile_at(x, y + d);
 						}
+
+						/* detect edges */
+						for ( var x = 1; x < w-1; x++ ){
+								if ( row[x-1] != TILE_EMPTY && row[x] == TILE_EMPTY ){
+										row[x-1] = TILE_EDGE_LEFT;
+								}
+								if ( row[x+1] != TILE_EMPTY && row[x] == TILE_EMPTY ){
+										row[x+1] = TILE_EDGE_RIGHT;
+								}
+						}
+
 						map.push(row)
 				}
 				map_begin = d;
