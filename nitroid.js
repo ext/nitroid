@@ -23,14 +23,18 @@ var nitroid = new function() {
 		var KEY_UP = 38;
 		var KEY_DOWN = 40;
 
+		var frand = function(v){
+				return Math.sin(v*429384) * Math.cos(v*17493340) * 0.5 + 0.5;
+		}
+
 		var wall_width = function(y){
 				var d = Math.sin(y * 0.05) * Math.atan(y * 0.15 + 7) * 5 + Math.cos(y * 0.5 + 11) * 1.1;
-				return Math.abs(d);
+				return Math.ceil(Math.abs(d));
 		}
 
 		var tile_at = function(x, y){
 				var w1 = wall_width(y);
-				var w2 = wall_width(y+1337)+1;
+				var w2 = wall_width(y+1337);
 
 				var is_wall = x < w1 || x >= (horizontal_tiles-w2);
 				var is_row = y % 12 == 0;
@@ -40,7 +44,15 @@ var nitroid = new function() {
 				}
 
 				if ( is_row ){
-						return TILE_PLATFORM;
+						var t = TILE_PLATFORM + (x - w1) % 7;
+
+						var width = horizontal_tiles - w1 - w2 - 1;
+						var size = Math.ceil(Math.abs(Math.sin(y * 4711)) * 3) + 3;
+						var pos = w1 + Math.floor(Math.abs(Math.cos(y * 1234)) * (width-6));
+						if ( x > pos && x < pos + size ){
+								return frand(y) > 0.8 ? TILE_EMPTY : (t+8);
+						}
+						return t;
 				}
 
 				return TILE_EMPTY;
@@ -66,9 +78,10 @@ var nitroid = new function() {
 								var tile = tile_at(x, ty);
 								if ( tile == TILE_EMPTY ) continue;
 
-								var sx = tile * tile_width;
+								var sx = (tile % 8) * tile_width;
+								var sy = Math.floor(tile / 8) * tile_height;
 								context.drawImage(tileset,
-								                  sx, 0,
+								                  sx, sy,
 								                  tile_width, tile_height,
 								                  x * tile_width, (y-offset) * tile_height,
 								                  tile_width, tile_height);
