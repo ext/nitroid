@@ -15,6 +15,7 @@ var nitroid = new function() {
 		var tile_height = 32;
 		var depth = 0.0;
 		var depth_min = 0.0;
+		var depth_scale = 0.4;         /* scaling factor when showing depth on hud */
 		var key = [];
 
 		/* level data */
@@ -156,13 +157,22 @@ var nitroid = new function() {
 								                  tile_width, tile_height); /* dst size */
 						}
 				}
+		}
 
+		var render_hud = function(){
+				var text = "Depth: " + Math.max(Math.floor(Math.floor(depth + vertical_tiles * 0.5)*depth_scale), 0) + "m";
+				context.font = "bold 15px monospace";
+				context.fillStyle = '#000';
+				context.fillText(text, 7, 17);
+				context.fillStyle = '#ff0';
+				context.fillText(text, 5, 15);
 		}
 
 		var render = function(){
 				render_clear();
 				render_background();
 				render_map();
+				render_hud();
 		};
 
 		/**
