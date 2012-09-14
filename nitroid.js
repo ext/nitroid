@@ -6,6 +6,10 @@ var nitroid = new function() {
 
 		/* parameters */
 		var platform_height = 12;      /* height between platforms */
+		var gravity = 10;              /* player gravity */
+		var player_jump = 16;          /* player jumping height per step */
+		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
+		var player_jump_threshold = 7; /* at what point the jump is floating in air */
 
 		var width = 0;
 		var height = 0;
@@ -22,6 +26,7 @@ var nitroid = new function() {
 		/* level data */
 		var map = [];       /* row, column */
 		var map_begin = -100; /* first row in cache */
+		var can_jump = 0;              /* number of "steps" the player may jump */
 
 		/* fps control */
 		var fps = 30;
@@ -88,13 +93,33 @@ var nitroid = new function() {
 		}
 
 		var update = function(){
-				if ( key[KEY_UP  ] ) depth -= 40.0 * dt;
-				if ( key[KEY_DOWN] ) depth += 40.0 * dt;
-
-				/* cannot go higher than this */
-				depth = Math.max(depth, depth_min);
+				floor = -1;
+				if ( map.length > 0 ){
+						floor = map[center_offset][10];
+				}
+				
+				if ( can_jump > 0 && key[KEY_UP] ){
+						if ( can_jump > player_jump_threshold ){
+								depth = Math.max(depth - player_jump * dt, depth_min);
+						}
+						can_jump--;
+				} else if ( floor == -1 ){
+						depth += gravity * dt;
+						can_jump = 0;
+				} else {
+						can_jump = player_jump_steps;
+				}
 
 				update_map();
+
+				//if ( key[KEY_UP  ] ) depth -= 40.0 * dt;
+				//if ( key[KEY_DOWN] ) depth += 40.0 * dt;
+
+
+				//console.log(floor);
+
+				/* cannot go higher than this */
+
 		};
 
 		/**
@@ -228,7 +253,7 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						horizontal_tiles = width / tile_width;
 						vertical_tiles   = height / tile_height;
-						center_offset    = vertical_tiles / 2;
+						center_offset    = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -vertical_tiles;
 
 						/* bind keys */
