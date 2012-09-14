@@ -13,12 +13,13 @@ var nitroid = new function() {
 		var vertical_tiles = 0;
 		var tile_width = 32;
 		var tile_height = 32;
-		var depth = 1.0;
+		var depth = 0.0;
+		var depth_min = 0.0;
 		var key = [];
 
 		/* level data */
 		var map = [];       /* row, column */
-		var map_begin = -1; /* first row in cache */
+		var map_begin = -100; /* first row in cache */
 
 		/* fps control */
 		var fps = 30;
@@ -39,20 +40,28 @@ var nitroid = new function() {
 				return Math.sin(v*429384) * Math.cos(v*17493340) * 0.5 + 0.5;
 		}
 
-		var wall_width = function(y){
+		var wall_width_tunnel = function(y){
 				var d = Math.sin(y * 0.05) * Math.atan(y * 0.15 + 7) * 5 + Math.cos(y * 0.5 + 11) * 1.1;
 				return Math.ceil(Math.abs(d));
+		}
+
+		var wall_width_top = function(y){
+				return 0;
+		}
+
+		var wall_width = function(y, offset){
+				return y >= 0 ? wall_width_tunnel(y+offset) : wall_width_top(y);
 		}
 
 		/**
 		 * Tell what tile is at the given coordinate.
 		 */
 		var tile_at = function(x, y){
-				var w1 = wall_width(y);
-				var w2 = wall_width(y+1337);
+				var w1 = wall_width(y, 0);
+				var w2 = wall_width(y, 1337);
 
 				var is_wall = x < w1 || x >= (horizontal_tiles-w2);
-				var is_row = y % platform_height == 0;
+				var is_row = y > 1 && y % platform_height == 0;
 
 				if ( is_wall ){
 						return TILE_WALL + Math.floor(frand(y*52 + x*19) * 6);
@@ -81,7 +90,7 @@ var nitroid = new function() {
 				if ( key[KEY_DOWN] ) depth += 40.0 * dt;
 
 				/* cannot go higher than this */
-				if ( depth < 1.0 ) depth = 1.0;
+				depth = Math.max(depth, depth_min);
 
 				update_map();
 		};
@@ -208,6 +217,7 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						horizontal_tiles = width / tile_width;
 						vertical_tiles   = height / tile_height;
+						depth = depth_min = -vertical_tiles;
 
 						/* bind keys */
 						$(document).keydown(keypress);
