@@ -10,6 +10,7 @@ var nitroid = new function() {
 		var player_jump = 16;          /* player jumping height per step */
 		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
 		var player_jump_threshold = 7; /* at what point the jump is floating in air */
+		var player_speed = 5.0;        /* how fast the player moves horizontally */
 
 		var width = 0;
 		var height = 0;
@@ -18,6 +19,7 @@ var nitroid = new function() {
 		var center_offset = 0;
 		var tile_width = 32;
 		var tile_height = 32;
+		var pos = 8;
 		var depth = 0.0;
 		var depth_min = 0.0;
 		var depth_scale = 0.4;         /* scaling factor when showing depth on hud */
@@ -41,6 +43,8 @@ var nitroid = new function() {
 		var TILE_EDGE_LEFT = 16;
 		var KEY_UP = 38;
 		var KEY_DOWN = 40;
+		var KEY_LEFT = 37;
+		var KEY_RIGHT = 39;
 
 		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
@@ -95,9 +99,9 @@ var nitroid = new function() {
 		var update = function(){
 				floor = -1;
 				if ( map.length > 0 ){
-						floor = map[center_offset][10];
+						floor = map[center_offset][Math.round(pos)];
 				}
-				
+
 				if ( can_jump > 0 && key[KEY_UP] ){
 						if ( can_jump > player_jump_threshold ){
 								depth = Math.max(depth - player_jump * dt, depth_min);
@@ -110,16 +114,14 @@ var nitroid = new function() {
 						can_jump = player_jump_steps;
 				}
 
+				if ( key[KEY_LEFT] ){
+						pos -= player_speed * dt;
+				}
+				if ( key[KEY_RIGHT] ){
+						pos += player_speed * dt;
+				}
+
 				update_map();
-
-				//if ( key[KEY_UP  ] ) depth -= 40.0 * dt;
-				//if ( key[KEY_DOWN] ) depth += 40.0 * dt;
-
-
-				//console.log(floor);
-
-				/* cannot go higher than this */
-
 		};
 
 		/**
@@ -185,6 +187,11 @@ var nitroid = new function() {
 				}
 		}
 
+		var render_player = function(){
+				context.fillStyle = '#f0f';
+				context.fillRect(pos * tile_width, center_offset * tile_height - 50, 25, 50);
+		}
+
 		var render_hud = function(){
 				var text = "Depth: " + Math.max(Math.floor((depth + center_offset)*depth_scale), 0) + "m";
 				context.font = "bold 15px monospace";
@@ -198,6 +205,7 @@ var nitroid = new function() {
 				render_clear();
 				render_background();
 				render_map();
+				render_player();
 				render_hud();
 		};
 
@@ -208,11 +216,15 @@ var nitroid = new function() {
 		var key_handler = function(code, state){
 				/* normalize wasd to arrows */
 				if ( code == 83 ) code = KEY_DOWN;
-				if ( code == 87 ) code = KEY_UP;
+				if ( code == 87 ) code = KEY_UP
+;				if ( code == 65 ) code = KEY_LEFT;
+				if ( code == 68 ) code = KEY_RIGHT;
 
 				switch ( code ){
 				case KEY_UP:
 				case KEY_DOWN:
+				case KEY_LEFT:
+				case KEY_RIGHT:
 						key[code] = state;
 						break;
 
