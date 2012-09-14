@@ -11,6 +11,7 @@ var nitroid = new function() {
 		var height = 0;
 		var horizontal_tiles = 0;
 		var vertical_tiles = 0;
+		var center_offset = 0;
 		var tile_width = 32;
 		var tile_height = 32;
 		var depth = 0.0;
@@ -160,7 +161,7 @@ var nitroid = new function() {
 		}
 
 		var render_hud = function(){
-				var text = "Depth: " + Math.max(Math.floor(Math.floor(depth + vertical_tiles * 0.5)*depth_scale), 0) + "m";
+				var text = "Depth: " + Math.max(Math.floor((depth + center_offset)*depth_scale), 0) + "m";
 				context.font = "bold 15px monospace";
 				context.fillStyle = '#000';
 				context.fillText(text, 7, 17);
@@ -227,6 +228,7 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						horizontal_tiles = width / tile_width;
 						vertical_tiles   = height / tile_height;
+						center_offset    = vertical_tiles / 2;
 						depth = depth_min = -vertical_tiles;
 
 						/* bind keys */
