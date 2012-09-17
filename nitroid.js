@@ -293,6 +293,7 @@ var nitroid = new function() {
 
 						/* start game */
 						setInterval(expire, frame_delay);
+						update_map();
 				},
 		};
 }();
