@@ -24,6 +24,10 @@ var nitroid = new function() {
 		var depth_min = 0.0;
 		var depth_scale = 0.4;         /* scaling factor when showing depth on hud */
 		var key = [];
+		var player_width = 25;
+		var player_height = 50;
+		var player_width2 = player_width * 0.5;
+		var player_offset  = player_width / tile_width * 0.5;
 
 		/* level data */
 		var map = [];       /* row, column */
@@ -96,31 +100,71 @@ var nitroid = new function() {
 				return TILE_EMPTY;
 		}
 
-		var update = function(){
-				floor = -1;
-				if ( map.length > 0 ){
-						floor = map[center_offset][Math.round(pos)];
-				}
+		/**
+		 * Collision AABB test. Return true if colliding with map.
+		 * x and y is in worldspace.
+		 */
+		var collision_test = function(x, y, w, h){
+				for ( var i = 0; i < 2; i++ ){
+						for ( var j = 0; j < 2; j++ ){
+								var screen_x = x + w*i;
+								var screen_y = y + h*j;
+								var tile_x = Math.floor(screen_x);
+								var tile_y = Math.floor(screen_y)-map_begin;
+								if ( tile_x < 0 || tile_y < 0 || tile_y > vertical_tiles ) continue;
 
+								if ( map[tile_y][tile_x] != TILE_EMPTY ){
+										return true;
+								}
+						}
+				}
+				return false;
+		}
+
+		/**
+		 * Same as collision_test but with offsets and size automatically added.
+		 */
+		var player_collision_test = function(x, y){
+				return collision_test(x - player_width2 / tile_width, y, player_width/tile_width, -player_height/tile_height);
+		}
+
+		var update_player_movement = function(){
+				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
+
+				var new_pos = pos;
+				if ( key[KEY_LEFT]  ) new_pos -= player_speed * dt;
+				if ( key[KEY_RIGHT] )	new_pos += player_speed * dt;
+
+				if ( !player_collision_test(new_pos, depth-1e-9) ){
+						pos = new_pos;
+				}
+		}
+
+		var update_player_gravity = function(){
+				var new_depth = depth;
 				if ( can_jump > 0 && key[KEY_UP] ){
 						if ( can_jump > player_jump_threshold ){
-								depth = Math.max(depth - player_jump * dt, depth_min);
+								new_depth = Math.max(depth - player_jump * dt, depth_min);
 						}
 						can_jump--;
-				} else if ( floor == -1 ){
-						depth += gravity * dt;
-						can_jump = 0;
 				} else {
+						new_depth += gravity * dt;
+				}
+
+				if ( !player_collision_test(pos, new_depth) ){
+						depth = new_depth;
+						if ( !key[KEY_UP] ){
+								can_jump = 0;
+						}
+				} else {
+						depth = Math.floor(new_depth);
 						can_jump = player_jump_steps;
 				}
+		}
 
-				if ( key[KEY_LEFT] ){
-						pos -= player_speed * dt;
-				}
-				if ( key[KEY_RIGHT] ){
-						pos += player_speed * dt;
-				}
-
+		var update = function(){
+				update_player_movement();
+				update_player_gravity();
 				update_map();
 		};
 
@@ -128,7 +172,7 @@ var nitroid = new function() {
 		 * Recalculates the map cache if necessary.
 		 */
 		var update_map = function(){
-				var d = Math.floor(depth);
+				var d = Math.floor(depth) - center_offset;
 				if ( d == map_begin ) return;
 
 				var w = Math.ceil(horizontal_tiles);
@@ -189,7 +233,7 @@ var nitroid = new function() {
 
 		var render_player = function(){
 				context.fillStyle = '#f0f';
-				context.fillRect(pos * tile_width, center_offset * tile_height - 50, 25, 50);
+				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);
 		}
 
 		var render_hud = function(){
@@ -263,8 +307,8 @@ var nitroid = new function() {
 						var $this = $('#'+id);
 						width  = $this.attr('width');
 						height = $this.attr('height');
-						horizontal_tiles = width / tile_width;
-						vertical_tiles   = height / tile_height;
+						horizontal_tiles = Math.ceil(width / tile_width);
+						vertical_tiles   = Math.ceil(height / tile_height);
 						center_offset    = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -vertical_tiles;
 
