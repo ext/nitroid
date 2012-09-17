@@ -11,6 +11,7 @@ var nitroid = new function() {
 		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
 		var player_jump_threshold = 7; /* at what point the jump is floating in air */
 		var player_speed = 5.0;        /* how fast the player moves horizontally */
+		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
 
 		var width = 0;
 		var height = 0;
@@ -33,6 +34,7 @@ var nitroid = new function() {
 		var map = [];       /* row, column */
 		var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
+		var bombs = [];
 
 		/* fps control */
 		var fps = 30;
@@ -49,6 +51,7 @@ var nitroid = new function() {
 		var KEY_DOWN = 40;
 		var KEY_LEFT = 37;
 		var KEY_RIGHT = 39;
+		var KEY_DROP = KEY_DOWN;
 
 		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
@@ -162,9 +165,30 @@ var nitroid = new function() {
 				}
 		}
 
+		var drop_bomb = function(){
+				var touching_floor = player_collision_test(pos, depth);
+				if ( !touching_floor || bombs.length >= 3 ) return;
+
+				bombs.push({
+						x: pos,
+						y: depth,
+						lifespan: bomb_lifespan,
+				});
+		}
+
+		var update_bombs = function(){
+				for ( i in bombs ){						
+						bombs[i].lifespan -= dt;
+						if ( bombs[i].lifespan < 0.0 ){
+								bombs.splice(i, 1);
+						}
+				}
+		}
+
 		var update = function(){
 				update_player_movement();
 				update_player_gravity();
+				update_bombs();
 				update_map();
 		};
 
@@ -236,6 +260,20 @@ var nitroid = new function() {
 				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);
 		}
 
+		var render_bombs = function(){
+				for ( i in bombs ){
+						var size = 10;
+						var phase = 0;
+						if ( bombs[i].lifespan < 0.3 ){
+								size = 50;
+								phase = Math.floor(Math.sin(bombs[i].lifespan * 35) * 127 + 127);
+						}
+
+						context.fillStyle = 'rgb(255,'+phase+',0)';
+						context.fillRect(bombs[i].x * tile_height - size*0.5, (bombs[i].y - depth + center_offset) * tile_width - size*0.5, size, size);
+				}
+		}
+
 		var render_hud = function(){
 				var text = "Depth: " + Math.max(Math.floor((depth + center_offset)*depth_scale), 0) + "m";
 				context.font = "bold 15px monospace";
@@ -250,6 +288,7 @@ var nitroid = new function() {
 				render_background();
 				render_map();
 				render_player();
+				render_bombs();
 				render_hud();
 		};
 
@@ -266,10 +305,15 @@ var nitroid = new function() {
 
 				switch ( code ){
 				case KEY_UP:
-				case KEY_DOWN:
 				case KEY_LEFT:
 				case KEY_RIGHT:
 						key[code] = state;
+						break;
+
+				case KEY_DOWN:
+						if ( state ){
+								drop_bomb();
+						}
 						break;
 
 				default:
