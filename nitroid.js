@@ -53,7 +53,9 @@ var nitroid = new function() {
 		var KEY_DOWN = 40;
 		var KEY_LEFT = 37;
 		var KEY_RIGHT = 39;
+		var KEY_SPACE = 32;
 		var KEY_DROP = KEY_DOWN;
+		var KEY_JUMP = KEY_SPACE;
 
 		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
@@ -147,7 +149,7 @@ var nitroid = new function() {
 
 		var update_player_gravity = function(){
 				var new_depth = depth;
-				if ( can_jump > 0 && key[KEY_UP] ){
+				if ( can_jump > 0 && key[KEY_JUMP] ){
 						if ( can_jump > player_jump_threshold ){
 								new_depth = Math.max(depth - player_jump * dt, depth_min);
 						}
@@ -158,7 +160,7 @@ var nitroid = new function() {
 
 				if ( !player_collision_test(pos, new_depth) ){
 						depth = new_depth;
-						if ( !key[KEY_UP] ){
+						if ( !key[KEY_JUMP] ){
 								can_jump = 0;
 						}
 				} else {
@@ -332,6 +334,7 @@ var nitroid = new function() {
 				case KEY_UP:
 				case KEY_LEFT:
 				case KEY_RIGHT:
+				case KEY_SPACE:
 						key[code] = state;
 						break;
 
