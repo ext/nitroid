@@ -33,7 +33,8 @@ var nitroid = new function() {
 
 		/* level data */
 		var map = [];       /* row, column */
-		var map_begin = -100; /* first row in cache */
+		var map_end = -1;		/* last cached row */
+		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
 		var bombs = [];
 
@@ -114,8 +115,8 @@ var nitroid = new function() {
 								var screen_x = x + w*i;
 								var screen_y = y + h*j;
 								var tile_x = Math.floor(screen_x);
-								var tile_y = Math.floor(screen_y)-map_begin;
-								if ( tile_x < 0 || tile_y < 0 || tile_y > vertical_tiles ) continue;
+								var tile_y = Math.floor(screen_y);
+								if ( tile_x < 0 || tile_y < 0 ) continue;
 
 								if ( map[tile_y][tile_x] != TILE_EMPTY ){
 										return true;
@@ -184,10 +185,10 @@ var nitroid = new function() {
 								sx = Math.ceil(bomb_blast / horizontal_tiles);
 								sy = Math.ceil(bomb_blast / vertical_tiles);
 								for ( var y = -sy; y < sy; y++ ){
-										var py = Math.floor(bombs[i].y + y - map_begin);
+										var py = Math.floor(bombs[i].y + y);
 										for ( var x = -sx; x < sx; x++ ){
 												var px = Math.floor(bombs[i].x + x);
-												if ( px < 0 || py < 0 || py > vertical_tiles ) continue;
+												if ( px < 0 || py < 0 ) continue;
 												var tile = map[py][px];
 												if ( tile == -1 ) continue;
 												if ( tile >= 8 && tile < 16 ){
@@ -213,16 +214,18 @@ var nitroid = new function() {
 		 */
 		var update_map = function(){
 				var d = Math.floor(depth) - center_offset;
-				if ( d == map_begin ) return;
+
+				if(d + vertical_tiles < map_end) return;
 
 				var w = Math.ceil(horizontal_tiles);
-				map.length = 0;
-				for ( var y = 0; y < vertical_tiles + 1; y++ ){
+
+				for ( var y = map_end + 1; y < d + vertical_tiles + 1; y++ ){
+						if(y < 0) continue;
 						var row = new Array(w);
 
 						/* raw values */
 						for ( var x = 0; x < w; x++ ){
-								row[x] = tile_at(x, y + d);
+								row[x] = tile_at(x, y);
 						}
 
 						/* detect edges */
@@ -237,7 +240,7 @@ var nitroid = new function() {
 
 						map.push(row)
 				}
-				map_begin = d;
+				map_end = d + vertical_tiles;
 		};
 
 		var render_clear = function(){
@@ -252,11 +255,17 @@ var nitroid = new function() {
 				/* offset in y-axis for in-tile scrolling ("pixelperfect") */
 				var offset = (depth - Math.floor(depth));
 
+				/* start y-offset in map */
+				var d = Math.floor(depth) - center_offset;
+
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
 						var py = (y-offset) * tile_height;
+						var ty = d + y;
+						if(ty < 0) continue;
+							
 
 						for ( var x = 0; x < horizontal_tiles; x++ ){
-								var tile = map[y][x];
+								var tile = map[ty][x];
 								if ( tile == TILE_EMPTY ) continue;
 
 								var sx = (tile % 8) * tile_width;
