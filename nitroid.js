@@ -185,9 +185,9 @@ var nitroid = new function() {
 								sx = Math.ceil(bomb_blast / horizontal_tiles);
 								sy = Math.ceil(bomb_blast / vertical_tiles);
 								for ( var y = -sy; y < sy; y++ ){
-										var py = Math.floor(bombs[i].y + y);
+										var py = Math.round(bombs[i].y) + y;
 										for ( var x = -sx; x < sx; x++ ){
-												var px = Math.floor(bombs[i].x + x);
+												var px = Math.round(bombs[i].x) + x;
 												if ( px < 0 || py < 0 ) continue;
 												var tile = map[py][px];
 												if ( tile == -1 ) continue;
