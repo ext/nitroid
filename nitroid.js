@@ -12,6 +12,7 @@ var nitroid = new function() {
 		var player_jump_threshold = 7; /* at what point the jump is floating in air */
 		var player_speed = 5.0;        /* how fast the player moves horizontally */
 		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
+		var bomb_blast = 20;           /* blast radius */
 
 		var width = 0;
 		var height = 0;
@@ -180,6 +181,21 @@ var nitroid = new function() {
 				for ( i in bombs ){						
 						bombs[i].lifespan -= dt;
 						if ( bombs[i].lifespan < 0.0 ){
+								sx = Math.ceil(bomb_blast / horizontal_tiles);
+								sy = Math.ceil(bomb_blast / vertical_tiles);
+								for ( var y = -sy; y < sy; y++ ){
+										var py = Math.floor(bombs[i].y + y - map_begin);
+										for ( var x = -sx; x < sx; x++ ){
+												var px = Math.floor(bombs[i].x + x);
+												if ( px < 0 || py < 0 || py > vertical_tiles ) continue;
+												var tile = map[py][px];
+												if ( tile == -1 ) continue;
+												if ( tile >= 8 && tile < 16 ){
+														map[py][px] = -1;
+												}
+										}
+								}
+
 								bombs.splice(i, 1);
 						}
 				}
@@ -265,7 +281,7 @@ var nitroid = new function() {
 						var size = 10;
 						var phase = 0;
 						if ( bombs[i].lifespan < 0.3 ){
-								size = 50;
+								size = bomb_blast;
 								phase = Math.floor(Math.sin(bombs[i].lifespan * 35) * 127 + 127);
 						}
 
