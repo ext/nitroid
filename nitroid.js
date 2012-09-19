@@ -4,6 +4,7 @@ var nitroid = new function() {
 		var context = null;
 		var tileset = new Image();
 		var weapons = new Image();
+		var animation_tiles = new Image();
 
 		/* parameters */
 		var platform_height = 12;      /* height between platforms */
@@ -33,6 +34,7 @@ var nitroid = new function() {
 		var player_width = 25;
 		var player_height = 50;
 		var player_width2 = player_width * 0.5;
+		var player_height2 = player_height * 0.5;
 		var player_offset  = player_width / tile_width * 0.5;
 
 		/* level data */
@@ -55,10 +57,27 @@ var nitroid = new function() {
 			}
 		];
 
+		var animations = {
+			player_run_aim_forward: {
+				tile_start: new vector(0.0, 0.0),
+				tile_size: new vector(49, 49),
+				frames: 10
+			},
+			player_run_aim_up: {
+				tile_start: new vector(0.0, 49.0),
+				tile_size: new vector(49, 49),
+				frames: 10
+			}
+		}
+
+		var player_animation = {animation: animations.player_run_aim_forward, frame: 0, facing: 1};
+
 		/* fps control */
 		var fps = 30;
 		var frame_delay = 1000 / fps;
 		var dt = 1.0 / fps;
+		var animation_fps = 10;
+		var animation_df = dt * animation_fps;
 
 		/* constants */
 		var TILE_EMPTY = -1;
@@ -157,14 +176,24 @@ var nitroid = new function() {
 		var update_player_movement = function(){
 				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
 
+				if(key[KEY_UP] && (key[KEY_LEFT] || key[KEY_RIGHT])) {
+					player_animation.animation = animations.player_run_aim_up;
+				} else {
+					player_animation.animation = animations.player_run_aim_forward;
+				}
+
 				var new_pos = pos;
 				if ( key[KEY_LEFT]  ) { 
 					new_pos -= player_speed * dt;
 					player_horizontal_direction = -1;
+					player_animation.facing = -1;
+					player_animation.frame += animation_df;
 				}
 				if ( key[KEY_RIGHT] )	{
 					new_pos += player_speed * dt;
 					player_horizontal_direction = 1;
+					player_animation.facing = 1;
+					player_animation.frame += animation_df;
 				}
 
 				if ( !player_collision_test(new_pos, depth-1e-9) ){
@@ -367,9 +396,25 @@ var nitroid = new function() {
 				}
 		}
 
+		var render_animation = function(animation_data, position) {
+			var a = animation_data.animation;
+			var sx = a.tile_start.x + a.tile_size.x * Math.floor(animation_data.frame % a.frames);
+			var sy = a.tile_start.y;
+			context.save();
+			context.translate(position.x, position.y);
+			context.scale(animation_data.facing, 1);
+			context.drawImage(animation_tiles,
+												sx, sy,                   /* src */
+												a.tile_size.x, a.tile_size.y,  /* src size */
+												-a.tile_size.x * 0.5, -a.tile_size.y * 0.5,  /* dst */
+												a.tile_size.x, a.tile_size.y); /* dst size */
+			context.restore();
+		}
+
 		var render_player = function(){
-				context.fillStyle = '#f0f';
-				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);
+				/*context.fillStyle = '#f0f';
+				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);*/
+			 render_animation(player_animation, new vector(pos * tile_width, center_offset * tile_height - player_height2) );
 		}
 
 		var render_bombs = function(){
@@ -510,6 +555,7 @@ var nitroid = new function() {
 						/* preload graphics */
 						tileset.src = 'tileset.png';
 						weapons.src = 'weapons.png';
+						animation_tiles.src = 'animations.png';
 
 						/* apply background */
 						wrapper = canvas.parentNode;
