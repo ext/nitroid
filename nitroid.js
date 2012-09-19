@@ -364,10 +364,6 @@ var nitroid = new function() {
 				var sx = (tile % 8) * projectile_width;
 				var sy = Math.floor(tile / 8) * projectile_height;
 
-				context.fillStyle = 'rgb(255,0,0)';
-				context.fillRect(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + center_offset)  * tile_height, 4, 4);
-				context.save();
-
 				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + center_offset)  * tile_height);
 				context.rotate(projectiles[i].rotation);
 				context.drawImage(weapons,
