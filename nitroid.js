@@ -19,6 +19,7 @@ var nitroid = new function() {
 		var height = 0;
 		var horizontal_tiles = 0;
 		var vertical_tiles = 0;
+		var x_screencenter = 0;
 		var y_screencenter = 0;
 		var tile_width = 32;
 		var tile_height = 32;
@@ -628,6 +629,7 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						horizontal_tiles = Math.ceil(width / tile_width);
 						vertical_tiles   = Math.ceil(height / tile_height);
+						x_screencenter = Math.floor(horizontal_tiles / 2);
 						y_screencenter = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -1;
 
