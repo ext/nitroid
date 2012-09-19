@@ -41,7 +41,7 @@ var nitroid = new function() {
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
 		var bombs = [];
-		var projectiles = [];	/* projectile: position, velocity, rotation, type */
+		var projectiles = [];	/* projectile: pos, velocity, rotation, type */
 		var selected_projectile_type = 0;
 		var player_horizontal_direction = 1; /* -1 or 1 (left or right)  */
 
@@ -208,25 +208,25 @@ var nitroid = new function() {
 		var fire_projectile = function() {
 			var p = {
 				type: selected_projectile_type,
-				pos: { x: pos, y: depth - (player_height * 0.5) / tile_height },
+				pos: new vector(pos, depth - (player_height * 0.5) / tile_height ),
 				rotation: player_horizontal_direction == -1 ? Math.PI : 0,
-				velocity: { x: player_horizontal_direction, y: 0},
+				velocity: new vector(player_horizontal_direction, 0),
 				explode: 0 /* Not currently exploding */
 			};
 			if(key[KEY_UP] && key[KEY_LEFT]) {
 				p.rotation = Math.PI + Math.PI / 4.0;
-				p.velocity = { x: -1, y: -1 };
+				p.velocity = new vector(-1, -1);
 			} else if(key[KEY_UP] && key[KEY_RIGHT]) {
 				p.rotation = Math.PI + 3.0 *Math.PI / 4.0;
-				p.velocity = { x: 1, y: -1 };
+				p.velocity = new vector(1, -1);
 			} else if(key[KEY_UP]) {
 				p.rotation = Math.PI + Math.PI / 2.0;
-				p.velocity = { x: 0, y: -1 };
+				p.velocity = new vector(0, -1);
 			}
-			p.velocity = vector_normalize(p.velocity);
+			p.velocity = p.velocity.normalize();
 
-			p.pos = vector_add(p.pos, vector_scalar_multiply(p.velocity, projectile_spawn_offset));
-			p.velocity = vector_scalar_multiply(p.velocity, projectile_types[p.type].speed);
+			p.pos = p.pos.add(p.velocity.multiply(projectile_spawn_offset));
+			p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
 
 			projectiles.push(p);
 		}
@@ -265,7 +265,7 @@ var nitroid = new function() {
 						projectiles.splice(i, 1);
 					}
 				} else {
-					p.pos = vector_add(p.pos, vector_scalar_multiply(p.velocity, dt));
+					p.pos = p.pos.add(p.velocity.multiply(dt));
 					if(collision_test(p.pos.x, p.pos.y, projectile_width / tile_width, projectile_height / tile_height)) {
 						projectiles[i].explode = 1.2;
 						var blast = projectile_types[p.type].blast;

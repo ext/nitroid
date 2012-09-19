@@ -1,24 +1,29 @@
-function vector_add(v1, v2) {
-	return { x: v1.x + v2.x, y: v1.y + v2.y }
-}
+function vector(x_, y_) {
+	this.x = x_;
+	this.y = y_;
 
-function vector_subtract(v1, v2) {
-	return vector_add(v1, -v2);
-}
+	this.add = function(v) {
+		return new vector(this.x + v.x, this.y + v.y);
+	}
 
-function vector_scalar_multiply(v1, scalar) {
-	return { x: v1.x * scalar, y: v1.y * scalar};
-}
+	this.subtract = function(v) {
+		return new vector(this.x - v.x, this.y - v.y);
+	}
 
-function vector_dot(v1, v2) {
-	return v1.x * v2.x + v1.y * v2.y;
-}
+	this.multiply = function(s) {
+		return new vector(this.x * s, this.y * s);
+	}
 
-function vector_length(v) {
-	return Math.sqrt(vector_dot(v, v));
-}
+	this.dot = function(v) {
+		return this.x * v.x + this.y * v.y;
+	}
 
-function vector_normalize(v) {
-	var len = vector_length(v);
-	return { x: v.x / len, y: v.y / len };
+	this.length = function() {
+		return Math.sqrt(this.dot(this));
+	}
+
+	this.normalize = function() {
+		var len = this.length();
+		return new vector(this.x / len, this.y / len);
+	}
 }
