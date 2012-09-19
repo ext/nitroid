@@ -47,6 +47,30 @@ var nitroid = new function() {
 		var player_horizontal_direction = 1; /* -1 or 1 (left or right)  */
 
 
+		/* fps control */
+		var fps = 30;
+		var frame_delay = 1000 / fps;
+		var dt = 1.0 / fps;
+		var animation_fps = 10;
+		var animation_df = dt * animation_fps;
+
+		/* constants */
+		var TILE_EMPTY = -1;
+		var TILE_PLATFORM = 0;
+		var TILE_WALL = 18;
+		var TILE_EDGE_RIGHT = 17;
+		var TILE_EDGE_LEFT = 16;
+		var KEY_UP = 38;
+		var KEY_DOWN = 40;
+		var KEY_LEFT = 37;
+		var KEY_RIGHT = 39;
+		var KEY_SPACE = 32;
+		var KEY_CTRL = 17;
+		var KEY_SHIFT = 16;
+		var KEY_DROP = KEY_SHIFT;
+		var KEY_JUMP = KEY_SPACE;
+		var KEY_FIRE = KEY_CTRL;
+
 		var animations = {
 			player_run_aim_forward: {
 				tile_start: new vector(0.0, 0.0),
@@ -92,6 +116,11 @@ var nitroid = new function() {
 				tile_start: new vector(544, 49),
 				tile_size: new vector(16, 16),
 				frames: 1
+			},
+			enemy_walker1: {
+				tile_start: new vector(552, 70),
+				tile_size: new vector(24, 18),
+				frames: 6
 			}
 		}
 
@@ -104,31 +133,20 @@ var nitroid = new function() {
 			}
 		];
 
+		var enemy_types = [
+			{
+				/* walker */
+				animation: animations.enemy_walker1,
+				life: 20,
+				run: function(instance) {
+					/* TODO! */
+				}
+			}
+		]
+
+		var enemies = []; /* position, type, life, animation_data */
+
 		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1};
-
-		/* fps control */
-		var fps = 30;
-		var frame_delay = 1000 / fps;
-		var dt = 1.0 / fps;
-		var animation_fps = 10;
-		var animation_df = dt * animation_fps;
-
-		/* constants */
-		var TILE_EMPTY = -1;
-		var TILE_PLATFORM = 0;
-		var TILE_WALL = 18;
-		var TILE_EDGE_RIGHT = 17;
-		var TILE_EDGE_LEFT = 16;
-		var KEY_UP = 38;
-		var KEY_DOWN = 40;
-		var KEY_LEFT = 37;
-		var KEY_RIGHT = 39;
-		var KEY_SPACE = 32;
-		var KEY_CTRL = 17;
-		var KEY_SHIFT = 16;
-		var KEY_DROP = KEY_SHIFT;
-		var KEY_JUMP = KEY_SPACE;
-		var KEY_FIRE = KEY_CTRL;
 
 		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
