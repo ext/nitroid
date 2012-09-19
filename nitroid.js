@@ -92,6 +92,11 @@ var nitroid = new function() {
 				tile_start: new vector(49*10, 49.0),
 				tile_size: new vector(49, 56),
 				frames: 1
+			},
+			player_aim_down: {
+				tile_start: new vector(49*10, 108.0),
+				tile_size: new vector(49, 40),
+				frames: 1
 			}
 		}
 
@@ -210,13 +215,13 @@ var nitroid = new function() {
 					}
 				} else if(key[KEY_UP]) {
 					player_animation.animation = animations.player_aim_up;
-					player_animation.frame = 1;
-				/*} else if(key[KEY_DOWN]) {
+					player_animation.frame = 0;
+				} else if(key[KEY_DOWN]) {
 					player_animation.animation = animations.player_aim_down;
-					player_animation.frame = 0;*/
+					player_animation.frame = 0;
 				} else {
 					player_animation.animation = animations.player_aim_forward;
-					player_animation.frame = 1;
+					player_animation.frame = 0;
 				}
 
 				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
@@ -296,9 +301,9 @@ var nitroid = new function() {
 			} else if(key[KEY_DOWN] && key[KEY_RIGHT]) {
 				p.rotation = Math.PI / 4.0;
 				p.velocity = new vector(1, 1);
-			/*} else if(key[KEY_DOWN]) { //TODO: checks!
+			} else if(key[KEY_DOWN]) {
 				p.rotation = Math.PI / 2.0;
-				p.velocity = new vector(0, 1); */
+				p.velocity = new vector(0, 1); 
 			}
 			p.velocity = p.velocity.normalize();
 
