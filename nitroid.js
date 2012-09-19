@@ -290,6 +290,15 @@ var nitroid = new function() {
 			} else if(key[KEY_UP]) {
 				p.rotation = Math.PI + Math.PI / 2.0;
 				p.velocity = new vector(0, -1);
+			} else if(key[KEY_DOWN] && key[KEY_LEFT]) {
+				p.rotation = 3.0 * Math.PI / 4.0;
+				p.velocity = new vector(-1, 1);
+			} else if(key[KEY_DOWN] && key[KEY_RIGHT]) {
+				p.rotation = Math.PI / 4.0;
+				p.velocity = new vector(1, 1);
+			/*} else if(key[KEY_DOWN]) { //TODO: checks!
+				p.rotation = Math.PI / 2.0;
+				p.velocity = new vector(0, 1); */
 			}
 			p.velocity = p.velocity.normalize();
 
