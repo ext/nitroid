@@ -63,14 +63,39 @@ var nitroid = new function() {
 				tile_size: new vector(49, 49),
 				frames: 10
 			},
-			player_run_aim_up: {
+			player_run_aim_diagonal_up: {
 				tile_start: new vector(0.0, 49.0),
 				tile_size: new vector(49, 49),
 				frames: 10
+			},
+			player_run_aim_diagonal_down: {
+				tile_start: new vector(0.0, 2*49.0),
+				tile_size: new vector(49, 49),
+				frames: 10
+			},
+			player_aim_forward: {
+				tile_start: new vector(49*10, 0.0),
+				tile_size: new vector(49, 49),
+				frames: 1
+			},
+			player_aim_diagonal_up: {
+				tile_start: new vector(49*12, 0.0),
+				tile_size: new vector(49, 49),
+				frames: 1
+			},
+			player_aim_diagonal_down: {
+				tile_start: new vector(49*11, 0.0),
+				tile_size: new vector(49, 49),
+				frames: 1
+			},
+			player_aim_up: {
+				tile_start: new vector(49*10, 49.0),
+				tile_size: new vector(49, 56),
+				frames: 1
 			}
 		}
 
-		var player_animation = {animation: animations.player_run_aim_forward, frame: 0, facing: 1};
+		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1};
 
 		/* fps control */
 		var fps = 30;
@@ -91,7 +116,8 @@ var nitroid = new function() {
 		var KEY_RIGHT = 39;
 		var KEY_SPACE = 32;
 		var KEY_CTRL = 17;
-		var KEY_DROP = KEY_DOWN;
+		var KEY_SHIFT = 16;
+		var KEY_DROP = KEY_SHIFT;
 		var KEY_JUMP = KEY_SPACE;
 		var KEY_FIRE = KEY_CTRL;
 
@@ -174,13 +200,26 @@ var nitroid = new function() {
 		}
 
 		var update_player_movement = function(){
-				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
-
-				if(key[KEY_UP] && (key[KEY_LEFT] || key[KEY_RIGHT])) {
-					player_animation.animation = animations.player_run_aim_up;
+				if (key[KEY_LEFT] || key[KEY_RIGHT]) {
+					if(key[KEY_UP]) {
+						player_animation.animation = animations.player_run_aim_diagonal_up;
+					} else if(key[KEY_DOWN]) {
+						player_animation.animation = animations.player_run_aim_diagonal_down
+					} else {
+						player_animation.animation = animations.player_run_aim_forward;
+					}
+				} else if(key[KEY_UP]) {
+					player_animation.animation = animations.player_aim_up;
+					player_animation.frame = 1;
+				/*} else if(key[KEY_DOWN]) {
+					player_animation.animation = animations.player_aim_down;
+					player_animation.frame = 0;*/
 				} else {
-					player_animation.animation = animations.player_run_aim_forward;
+					player_animation.animation = animations.player_aim_forward;
+					player_animation.frame = 1;
 				}
+
+				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
 
 				var new_pos = pos;
 				if ( key[KEY_LEFT]  ) { 
@@ -414,7 +453,7 @@ var nitroid = new function() {
 		var render_player = function(){
 				/*context.fillStyle = '#f0f';
 				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);*/
-			 render_animation(player_animation, new vector(pos * tile_width, center_offset * tile_height - player_height2) );
+			 render_animation(player_animation, new vector(pos * tile_width, center_offset * tile_height - player_animation.animation.tile_size.y * 0.5) );
 		}
 
 		var render_bombs = function(){
@@ -488,13 +527,14 @@ var nitroid = new function() {
 
 				switch ( code ){
 				case KEY_UP:
+				case KEY_DOWN:
 				case KEY_LEFT:
 				case KEY_RIGHT:
 				case KEY_SPACE:
 						key[code] = state;
 						break;
 
-				case KEY_DOWN:
+				case KEY_DROP:
 						if ( state ){
 								drop_bomb();
 						}
