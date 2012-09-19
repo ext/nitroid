@@ -50,7 +50,8 @@ var nitroid = new function() {
 			{
 				tile: 0,
 				damage: 1.0,
-				speed: 5.0
+				speed: 5.0,
+				blast: 20.0
 			}
 		];
 
@@ -209,7 +210,8 @@ var nitroid = new function() {
 				type: selected_projectile_type,
 				pos: { x: pos, y: depth - (player_height * 0.5) / tile_height },
 				rotation: player_horizontal_direction == -1 ? Math.PI : 0,
-				velocity: { x: player_horizontal_direction, y: 0}
+				velocity: { x: player_horizontal_direction, y: 0},
+				explode: 0 /* Not currently exploding */
 			};
 			if(key[KEY_UP] && key[KEY_LEFT]) {
 				p.rotation = Math.PI + Math.PI / 4.0;
@@ -256,7 +258,33 @@ var nitroid = new function() {
 		var update_projectiles = function() {
 			for (i in projectiles) {
 				var p = projectiles[i];
-				p.pos = vector_add(p.pos, vector_scalar_multiply(p.velocity, dt));
+				if(projectiles[i].explode > 0) {
+					projectiles[i].explode -= dt;
+					if(projectiles[i].explode < 1.0) {
+						//Despawn
+						projectiles.splice(i, 1);
+					}
+				} else {
+					p.pos = vector_add(p.pos, vector_scalar_multiply(p.velocity, dt));
+					if(collision_test(p.pos.x, p.pos.y, projectile_width / tile_width, projectile_height / tile_height)) {
+						projectiles[i].explode = 1.2;
+						var blast = projectile_types[p.type].blast;
+						sx = Math.ceil(blast / horizontal_tiles);
+						sy = Math.ceil(blast / vertical_tiles);
+						for ( var y = -sy; y < sy; y++ ){
+								var py = Math.round(p.pos.y) + y;
+								for ( var x = -sx; x < sx; x++ ){
+										var px = Math.round(p.pos.x) + x;
+										if ( px < 0 || py < 0 ) continue;
+										var tile = map[py][px];
+										if ( tile == -1 ) continue;
+										if ( tile >= 8 && tile < 16 ){
+												map[py][px] = -1;
+										}
+								}
+						}
+					}
+				}
 			}
 		}
 
@@ -364,13 +392,21 @@ var nitroid = new function() {
 				var sx = (tile % 8) * projectile_width;
 				var sy = Math.floor(tile / 8) * projectile_height;
 
+				context.save();
 				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + center_offset)  * tile_height);
-				context.rotate(projectiles[i].rotation);
-				context.drawImage(weapons,
-													sx, sy,                   /* src */
-													projectile_width, projectile_height,  /* src size */
-													-projectile_width * 0.5, -projectile_height * 0.5 ,  /* dst */
-													projectile_width, projectile_height); /* dst size */
+				if(projectiles[i].explode > 0) {
+					var blast = projectile_types[projectiles[i].type].blast;
+					var phase = Math.floor(Math.sin(projectiles[i].explode * 35) * 127 + 127);
+					context.fillStyle = 'rgb(255,'+phase+',0)';
+					context.fillRect(-blast * 0.5, -blast * 0.5, blast, blast);
+				} else {
+					context.rotate(projectiles[i].rotation);
+					context.drawImage(weapons,
+														sx, sy,                   /* src */
+														projectile_width, projectile_height,  /* src size */
+														-projectile_width * 0.5, -projectile_height * 0.5 ,  /* dst */
+														projectile_width, projectile_height); /* dst size */
+				}
 				context.restore();
 			}
 		}
