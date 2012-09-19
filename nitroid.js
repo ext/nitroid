@@ -7,7 +7,7 @@ var nitroid = new function() {
 
 		/* parameters */
 		var platform_height = 12;      /* height between platforms */
-		var gravity = 8;              /* player gravity */
+		var gravity = 8;               /* player gravity */
 		var player_jump = 16;          /* player jumping height per step */
 		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
 		var player_jump_threshold = 7; /* at what point the jump is floating in air */
@@ -19,7 +19,7 @@ var nitroid = new function() {
 		var height = 0;
 		var horizontal_tiles = 0;
 		var vertical_tiles = 0;
-		var center_offset = 0;
+		var y_screencenter = 0;
 		var tile_width = 32;
 		var tile_height = 32;
 		var projectile_width = 16;		 /* width of a projectile */
@@ -418,7 +418,7 @@ var nitroid = new function() {
 		 * Recalculates the map cache if necessary.
 		 */
 		var update_map = function(){
-				var d = Math.floor(depth) - center_offset;
+				var d = Math.floor(depth) - y_screencenter;
 
 				if(d + vertical_tiles < map_end) return;
 
@@ -461,7 +461,7 @@ var nitroid = new function() {
 				var offset = (depth - Math.floor(depth));
 
 				/* start y-offset in map */
-				var d = Math.floor(depth) - center_offset;
+				var d = Math.floor(depth) - y_screencenter;
 
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
 						var py = (y-offset) * tile_height;
@@ -501,9 +501,9 @@ var nitroid = new function() {
 
 		var render_player = function(){
 				/*context.fillStyle = '#f0f';
-				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);*/
+				context.fillRect(pos * tile_width - player_width2, y_screencenter * tile_height - player_height, player_width, player_height);*/
 			context.save();
-			var position = new vector(pos * tile_width, center_offset * tile_height - player_animation.animation.tile_size.y * 0.5) ;
+			var position = new vector(pos * tile_width, y_screencenter * tile_height - player_animation.animation.tile_size.y * 0.5) ;
 			context.translate(position.x, position.y);
 			render_animation(player_animation);
 			context.restore();
@@ -519,7 +519,7 @@ var nitroid = new function() {
 						}
 
 						context.fillStyle = 'rgb(255,'+phase+',0)';
-						context.fillRect(bombs[i].x * tile_height - size*0.5, (bombs[i].y - depth + center_offset) * tile_width - size*0.5, size, size);
+						context.fillRect(bombs[i].x * tile_height - size*0.5, (bombs[i].y - depth + y_screencenter) * tile_width - size*0.5, size, size);
 				}
 		}
 
@@ -527,7 +527,7 @@ var nitroid = new function() {
 			for ( i in projectiles) {
 
 				context.save();
-				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + center_offset)  * tile_height);
+				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + y_screencenter)  * tile_height);
 				if(projectiles[i].explode > 0) {
 					var blast = projectile_types[projectiles[i].type].blast;
 					var phase = Math.floor(Math.sin(projectiles[i].explode * 35) * 127 + 127);
@@ -542,7 +542,7 @@ var nitroid = new function() {
 		}
 
 		var render_hud = function(){
-				var text = "Depth: " + Math.max(Math.floor((depth + center_offset)*depth_scale), 0) + "m";
+				var text = "Depth: " + Math.max(Math.floor((depth + y_screencenter)*depth_scale), 0) + "m";
 				context.font = "bold 15px monospace";
 				context.fillStyle = '#000';
 				context.fillText(text, 7, 17);
@@ -628,7 +628,7 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						horizontal_tiles = Math.ceil(width / tile_width);
 						vertical_tiles   = Math.ceil(height / tile_height);
-						center_offset    = Math.floor(vertical_tiles / 2);
+						y_screencenter = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -1;
 
 						/* bind keys */
