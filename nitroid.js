@@ -3,12 +3,11 @@ var nitroid = new function() {
 		var canvas = null;
 		var context = null;
 		var tileset = new Image();
-		var weapons = new Image();
 		var animation_tiles = new Image();
 
 		/* parameters */
 		var platform_height = 12;      /* height between platforms */
-		var gravity = 10;              /* player gravity */
+		var gravity = 8;              /* player gravity */
 		var player_jump = 16;          /* player jumping height per step */
 		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
 		var player_jump_threshold = 7; /* at what point the jump is floating in air */
@@ -43,19 +42,10 @@ var nitroid = new function() {
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
 		var bombs = [];
-		var projectiles = [];	/* projectile: pos, velocity, rotation, type */
+		var projectiles = [];	/* projectile: pos, velocity, rotation, type, frame */
 		var selected_projectile_type = 0;
 		var player_horizontal_direction = 1; /* -1 or 1 (left or right)  */
 
-
-		var projectile_types = [
-			{
-				tile: 0,
-				damage: 1.0,
-				speed: 5.0,
-				blast: 20.0
-			}
-		];
 
 		var animations = {
 			player_run_aim_forward: {
@@ -97,8 +87,22 @@ var nitroid = new function() {
 				tile_start: new vector(49*10, 108.0),
 				tile_size: new vector(49, 40),
 				frames: 1
+			},
+			missile: {
+				tile_start: new vector(544, 49),
+				tile_size: new vector(16, 16),
+				frames: 1
 			}
 		}
+
+		var projectile_types = [
+			{
+				animation: animations.missile,
+				damage: 1.0,
+				speed: 9.0,
+				blast: 20.0
+			}
+		];
 
 		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1};
 
@@ -284,6 +288,7 @@ var nitroid = new function() {
 				pos: new vector(pos, depth - (player_height * 0.5) / tile_height ),
 				rotation: player_horizontal_direction == -1 ? Math.PI : 0,
 				velocity: new vector(player_horizontal_direction, 0),
+				frame: 0,
 				explode: 0 /* Not currently exploding */
 			};
 			if(key[KEY_UP] && key[KEY_LEFT]) {
@@ -449,12 +454,11 @@ var nitroid = new function() {
 				}
 		}
 
-		var render_animation = function(animation_data, position) {
+		var render_animation = function(animation_data) {
 			var a = animation_data.animation;
 			var sx = a.tile_start.x + a.tile_size.x * Math.floor(animation_data.frame % a.frames);
 			var sy = a.tile_start.y;
 			context.save();
-			context.translate(position.x, position.y);
 			context.scale(animation_data.facing, 1);
 			context.drawImage(animation_tiles,
 												sx, sy,                   /* src */
@@ -467,7 +471,11 @@ var nitroid = new function() {
 		var render_player = function(){
 				/*context.fillStyle = '#f0f';
 				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);*/
-			 render_animation(player_animation, new vector(pos * tile_width, center_offset * tile_height - player_animation.animation.tile_size.y * 0.5) );
+			context.save();
+			var position = new vector(pos * tile_width, center_offset * tile_height - player_animation.animation.tile_size.y * 0.5) ;
+			context.translate(position.x, position.y);
+			render_animation(player_animation);
+			context.restore();
 		}
 
 		var render_bombs = function(){
@@ -486,9 +494,6 @@ var nitroid = new function() {
 
 		var render_projectiles = function() {
 			for ( i in projectiles) {
-				tile = projectile_types[projectiles[i].type].tile;
-				var sx = (tile % 8) * projectile_width;
-				var sy = Math.floor(tile / 8) * projectile_height;
 
 				context.save();
 				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + center_offset)  * tile_height);
@@ -499,11 +504,7 @@ var nitroid = new function() {
 					context.fillRect(-blast * 0.5, -blast * 0.5, blast, blast);
 				} else {
 					context.rotate(projectiles[i].rotation);
-					context.drawImage(weapons,
-														sx, sy,                   /* src */
-														projectile_width, projectile_height,  /* src size */
-														-projectile_width * 0.5, -projectile_height * 0.5 ,  /* dst */
-														projectile_width, projectile_height); /* dst size */
+					render_animation({ animation: projectile_types[projectiles[i].type].animation, frame: projectiles[i].frame, facing: 1});
 				}
 				context.restore();
 			}
@@ -608,7 +609,6 @@ var nitroid = new function() {
 
 						/* preload graphics */
 						tileset.src = 'tileset.png';
-						weapons.src = 'weapons.png';
 						animation_tiles.src = 'animations.png';
 
 						/* apply background */
