@@ -37,6 +37,10 @@ var nitroid = new function() {
 		var player_height2 = player_height * 0.5;
 		var player_offset  = player_width / tile_width * 0.5;
 
+		/* camera */
+		var xcam = 0;
+		var ycam = 0;
+
 		/* level data */
 		var map = [];        /* row, column */
 		var map_end = -1;    /* last cached row */
@@ -296,6 +300,10 @@ var nitroid = new function() {
 				}
 		}
 
+		var update_camera = function(){
+				xcam = Math.min(Math.max(pos - x_screencenter, 0), map_width-horizontal_tiles);
+		}
+
 		var drop_bomb = function(){
 				var touching_floor = player_collision_test(pos, depth);
 				if ( !touching_floor || bombs.length >= 3 ) return;
@@ -411,6 +419,7 @@ var nitroid = new function() {
 		var update = function(){
 				update_player_movement();
 				update_player_gravity();
+				update_camera();
 				update_bombs();
 				update_map();
 				update_projectiles();
@@ -555,9 +564,16 @@ var nitroid = new function() {
 				render_clear();
 				render_background();
 				render_map();
+
+				context.save();
+				context.translate(-xcam * tile_width, 0);
+
 				render_player();
 				render_bombs();
 				render_projectiles();
+
+				context.restore();
+
 				render_hud();
 		};
 
