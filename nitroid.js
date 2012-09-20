@@ -44,7 +44,7 @@ var nitroid = new function() {
 		/* level data */
 		var map = [];        /* row, column */
 		var map_end = -1;    /* last cached row */
-		var map_width = 0;   /* width of the map in tiles */
+		var map_width = 60;  /* width of the map in tiles */
 
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
@@ -467,25 +467,29 @@ var nitroid = new function() {
 		}
 
 		var render_map = function(){
-				/* offset in y-axis for in-tile scrolling ("pixelperfect") */
-				var offset = (depth - Math.floor(depth));
+				/* offset in tiles for in-tile scrolling ("pixelperfect") */
+				var xoffset = (xcam - Math.floor(xcam));
+				var yoffset = (depth - Math.floor(depth));
 
-				/* start y-offset in map */
-				var d = Math.floor(depth) - y_screencenter;
+				/* start offset in map */
+				var xbegin = Math.floor(xcam);
+				var ybegin = Math.floor(depth) - y_screencenter;
+
+				context.save();
 
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
-						var py = (y-offset) * tile_height;
-						var ty = d + y;
+						var ty = ybegin + y;
+						var py = (y-yoffset) * tile_height;
 						if(ty < 0) continue;
-							
 
-						for ( var x = 0; x < horizontal_tiles; x++ ){
-								var tile = map[ty][x];
+						for ( var x = 0; x < horizontal_tiles + 1; x++ ){
+								var tx = xbegin + x;
+								var tile = map[ty][tx];
 								if ( tile == TILE_EMPTY ) continue;
 
 								var sx = (tile % 8) * tile_width;
 								var sy = Math.floor(tile / 8) * tile_height;
-								var px = x * tile_width;
+								var px = (x-xoffset) * tile_width;
 								context.drawImage(tileset,
 								                  sx, sy,                   /* src */
 								                  tile_width, tile_height,  /* src size */
@@ -493,6 +497,8 @@ var nitroid = new function() {
 								                  tile_width, tile_height); /* dst size */
 						}
 				}
+
+				context.restore();
 		}
 
 		var render_animation = function(animation_data) {
@@ -648,7 +654,6 @@ var nitroid = new function() {
 						x_screencenter = Math.floor(horizontal_tiles / 2);
 						y_screencenter = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -1;
-						map_width = horizontal_tiles;
 
 						/* bind keys */
 						$(document).keydown(keypress);
