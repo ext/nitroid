@@ -38,8 +38,10 @@ var nitroid = new function() {
 		var player_offset  = player_width / tile_width * 0.5;
 
 		/* level data */
-		var map = [];       /* row, column */
-		var map_end = -1;		/* last cached row */
+		var map = [];        /* row, column */
+		var map_end = -1;    /* last cached row */
+		var map_width = 0;   /* width of the map in tiles */
+
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
 		var bombs = [];
@@ -178,7 +180,7 @@ var nitroid = new function() {
 				var w1 = wall_width(y, 0);
 				var w2 = wall_width(y, 1337);
 
-				var is_wall = x < w1 || x >= (horizontal_tiles-w2);
+				var is_wall = x < w1 || x >= (map_width - w2);
 				var is_row = y > 1 && y % platform_height == 0;
 
 				if ( is_wall ){
@@ -190,7 +192,7 @@ var nitroid = new function() {
 						var t = TILE_PLATFORM + (x - w1) % 7;
 
 						/* Locate opening for platform */
-						var width = horizontal_tiles - w1 - w2 - 1;
+						var width = map_width - w1 - w2 - 1;
 						var size = Math.ceil(Math.abs(Math.sin(y * 4711)) * 3) + 3;
 						var pos = w1 + Math.floor(Math.abs(Math.cos(y * 1234)) * (width-6));
 						if ( x > pos && x < pos + size ){
@@ -423,19 +425,17 @@ var nitroid = new function() {
 
 				if(d + vertical_tiles < map_end) return;
 
-				var w = Math.ceil(horizontal_tiles);
-
 				for ( var y = map_end + 1; y < d + vertical_tiles + 1; y++ ){
 						if(y < 0) continue;
-						var row = new Array(w);
+						var row = new Array(map_width);
 
 						/* raw values */
-						for ( var x = 0; x < w; x++ ){
+						for ( var x = 0; x < map_width; x++ ){
 								row[x] = tile_at(x, y);
 						}
 
 						/* detect edges */
-						for ( var x = 1; x < w-1; x++ ){
+						for ( var x = 1; x < map_width-1; x++ ){
 								if ( row[x-1] != TILE_EMPTY && row[x] == TILE_EMPTY ){
 										row[x-1] = TILE_EDGE_LEFT;
 								}
@@ -632,6 +632,7 @@ var nitroid = new function() {
 						x_screencenter = Math.floor(horizontal_tiles / 2);
 						y_screencenter = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -1;
+						map_width = horizontal_tiles;
 
 						/* bind keys */
 						$(document).keydown(keypress);
