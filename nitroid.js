@@ -133,13 +133,17 @@ var nitroid = new function() {
 			}
 		];
 
+		var enemy_base_run = function(e) {
+			e.animation_data.frames += animation_df;
+		}
+
 		var enemy_types = [
 			{
 				/* walker */
 				animation: animations.enemy_walker1,
 				life: 20,
-				run: function(instance) {
-					/* TODO! */
+				run: function(e) { /* e : enemy instance */
+					enemy_base_run(e);
 				}
 			}
 		]
@@ -370,6 +374,7 @@ var nitroid = new function() {
 						projectiles.splice(i, 1);
 					}
 				} else {
+					p.frame += animation_df;
 					p.pos = p.pos.add(p.velocity.multiply(dt));
 					if(collision_test(p.pos.x, p.pos.y, projectile_width / tile_width, projectile_height / tile_height)) {
 						projectiles[i].explode = 1.2;
@@ -393,12 +398,20 @@ var nitroid = new function() {
 			}
 		}
 
+		var update_enemies = function() {
+			for(i in enemies) {
+				var type = enemy_types[enemies[i].type];
+				type.run(enemies[i]);
+			}
+		}
+
 		var update = function(){
 				update_player_movement();
 				update_player_gravity();
 				update_bombs();
 				update_map();
 				update_projectiles();
+				update_enemies();
 		};
 
 		/**
