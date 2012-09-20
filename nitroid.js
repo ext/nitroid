@@ -7,7 +7,7 @@ var nitroid = new function() {
 
 		/* parameters */
 		var platform_height = 12;      /* height between platforms */
-		var gravity = 8;              /* player gravity */
+		var gravity = 8;               /* player gravity */
 		var player_jump = 16;          /* player jumping height per step */
 		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
 		var player_jump_threshold = 7; /* at what point the jump is floating in air */
@@ -19,7 +19,8 @@ var nitroid = new function() {
 		var height = 0;
 		var horizontal_tiles = 0;
 		var vertical_tiles = 0;
-		var center_offset = 0;
+		var x_screencenter = 0;
+		var y_screencenter = 0;
 		var tile_width = 32;
 		var tile_height = 32;
 		var projectile_width = 16;		 /* width of a projectile */
@@ -36,9 +37,15 @@ var nitroid = new function() {
 		var player_height2 = player_height * 0.5;
 		var player_offset  = player_width / tile_width * 0.5;
 
+		/* camera */
+		var xcam = 0;
+		var ycam = 0;
+
 		/* level data */
-		var map = [];       /* row, column */
-		var map_end = -1;		/* last cached row */
+		var map = [];        /* row, column */
+		var map_end = -1;    /* last cached row */
+		var map_width = 60;  /* width of the map in tiles, can be overridden by user */
+
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
 		var bombs = [];
@@ -177,7 +184,7 @@ var nitroid = new function() {
 				var w1 = wall_width(y, 0);
 				var w2 = wall_width(y, 1337);
 
-				var is_wall = x < w1 || x >= (horizontal_tiles-w2);
+				var is_wall = x < w1 || x >= (map_width - w2);
 				var is_row = y > 1 && y % platform_height == 0;
 
 				if ( is_wall ){
@@ -189,7 +196,7 @@ var nitroid = new function() {
 						var t = TILE_PLATFORM + (x - w1) % 7;
 
 						/* Locate opening for platform */
-						var width = horizontal_tiles - w1 - w2 - 1;
+						var width = map_width - w1 - w2 - 1;
 						var size = Math.ceil(Math.abs(Math.sin(y * 4711)) * 3) + 3;
 						var pos = w1 + Math.floor(Math.abs(Math.cos(y * 1234)) * (width-6));
 						if ( x > pos && x < pos + size ){
@@ -291,6 +298,10 @@ var nitroid = new function() {
 						depth = Math.floor(new_depth);
 						can_jump = player_jump_steps;
 				}
+		}
+
+		var update_camera = function(){
+				xcam = Math.min(Math.max(pos - x_screencenter, 0), map_width-horizontal_tiles);
 		}
 
 		var drop_bomb = function(){
@@ -408,6 +419,7 @@ var nitroid = new function() {
 		var update = function(){
 				update_player_movement();
 				update_player_gravity();
+				update_camera();
 				update_bombs();
 				update_map();
 				update_projectiles();
@@ -418,23 +430,21 @@ var nitroid = new function() {
 		 * Recalculates the map cache if necessary.
 		 */
 		var update_map = function(){
-				var d = Math.floor(depth) - center_offset;
+				var d = Math.floor(depth) - y_screencenter;
 
 				if(d + vertical_tiles < map_end) return;
 
-				var w = Math.ceil(horizontal_tiles);
-
 				for ( var y = map_end + 1; y < d + vertical_tiles + 1; y++ ){
 						if(y < 0) continue;
-						var row = new Array(w);
+						var row = new Array(map_width);
 
 						/* raw values */
-						for ( var x = 0; x < w; x++ ){
+						for ( var x = 0; x < map_width; x++ ){
 								row[x] = tile_at(x, y);
 						}
 
 						/* detect edges */
-						for ( var x = 1; x < w-1; x++ ){
+						for ( var x = 1; x < map_width-1; x++ ){
 								if ( row[x-1] != TILE_EMPTY && row[x] == TILE_EMPTY ){
 										row[x-1] = TILE_EDGE_LEFT;
 								}
@@ -457,25 +467,29 @@ var nitroid = new function() {
 		}
 
 		var render_map = function(){
-				/* offset in y-axis for in-tile scrolling ("pixelperfect") */
-				var offset = (depth - Math.floor(depth));
+				/* offset in tiles for in-tile scrolling ("pixelperfect") */
+				var xoffset = (xcam - Math.floor(xcam));
+				var yoffset = (depth - Math.floor(depth));
 
-				/* start y-offset in map */
-				var d = Math.floor(depth) - center_offset;
+				/* start offset in map */
+				var xbegin = Math.floor(xcam);
+				var ybegin = Math.floor(depth) - y_screencenter;
+
+				context.save();
 
 				for ( var y = 0; y < vertical_tiles + 1; y++ ){
-						var py = (y-offset) * tile_height;
-						var ty = d + y;
+						var ty = ybegin + y;
+						var py = (y-yoffset) * tile_height;
 						if(ty < 0) continue;
-							
 
-						for ( var x = 0; x < horizontal_tiles; x++ ){
-								var tile = map[ty][x];
+						for ( var x = 0; x < horizontal_tiles + 1; x++ ){
+								var tx = xbegin + x;
+								var tile = map[ty][tx];
 								if ( tile == TILE_EMPTY ) continue;
 
 								var sx = (tile % 8) * tile_width;
 								var sy = Math.floor(tile / 8) * tile_height;
-								var px = x * tile_width;
+								var px = (x-xoffset) * tile_width;
 								context.drawImage(tileset,
 								                  sx, sy,                   /* src */
 								                  tile_width, tile_height,  /* src size */
@@ -483,6 +497,8 @@ var nitroid = new function() {
 								                  tile_width, tile_height); /* dst size */
 						}
 				}
+
+				context.restore();
 		}
 
 		var render_animation = function(animation_data) {
@@ -501,9 +517,9 @@ var nitroid = new function() {
 
 		var render_player = function(){
 				/*context.fillStyle = '#f0f';
-				context.fillRect(pos * tile_width - player_width2, center_offset * tile_height - player_height, player_width, player_height);*/
+				context.fillRect(pos * tile_width - player_width2, y_screencenter * tile_height - player_height, player_width, player_height);*/
 			context.save();
-			var position = new vector(pos * tile_width, center_offset * tile_height - player_animation.animation.tile_size.y * 0.5) ;
+			var position = new vector(pos * tile_width, y_screencenter * tile_height - player_animation.animation.tile_size.y * 0.5) ;
 			context.translate(position.x, position.y);
 			render_animation(player_animation);
 			context.restore();
@@ -519,7 +535,7 @@ var nitroid = new function() {
 						}
 
 						context.fillStyle = 'rgb(255,'+phase+',0)';
-						context.fillRect(bombs[i].x * tile_height - size*0.5, (bombs[i].y - depth + center_offset) * tile_width - size*0.5, size, size);
+						context.fillRect(bombs[i].x * tile_height - size*0.5, (bombs[i].y - depth + y_screencenter) * tile_width - size*0.5, size, size);
 				}
 		}
 
@@ -527,7 +543,7 @@ var nitroid = new function() {
 			for ( i in projectiles) {
 
 				context.save();
-				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + center_offset)  * tile_height);
+				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + y_screencenter)  * tile_height);
 				if(projectiles[i].explode > 0) {
 					var blast = projectile_types[projectiles[i].type].blast;
 					var phase = Math.floor(Math.sin(projectiles[i].explode * 35) * 127 + 127);
@@ -542,7 +558,7 @@ var nitroid = new function() {
 		}
 
 		var render_hud = function(){
-				var text = "Depth: " + Math.max(Math.floor((depth + center_offset)*depth_scale), 0) + "m";
+				var text = "Depth: " + Math.max(Math.floor((depth + y_screencenter)*depth_scale), 0) + "m";
 				context.font = "bold 15px monospace";
 				context.fillStyle = '#000';
 				context.fillText(text, 7, 17);
@@ -554,9 +570,16 @@ var nitroid = new function() {
 				render_clear();
 				render_background();
 				render_map();
+
+				context.save();
+				context.translate(-xcam * tile_width, 0);
+
 				render_player();
 				render_bombs();
 				render_projectiles();
+
+				context.restore();
+
 				render_hud();
 		};
 
@@ -628,7 +651,8 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						horizontal_tiles = Math.ceil(width / tile_width);
 						vertical_tiles   = Math.ceil(height / tile_height);
-						center_offset    = Math.floor(vertical_tiles / 2);
+						x_screencenter = Math.floor(horizontal_tiles / 2);
+						y_screencenter = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -1;
 
 						/* bind keys */
@@ -654,6 +678,7 @@ var nitroid = new function() {
 
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
+						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);
 
 						/* start game */
 						setInterval(expire, frame_delay);
@@ -664,6 +689,7 @@ var nitroid = new function() {
 
 $(document).ready(function(){
 		nitroid.init('nitroid', {
-				'platform_height': 8
+				'platform_height': 8,
+				'map_width': 50
 		});
 });
