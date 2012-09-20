@@ -44,7 +44,7 @@ var nitroid = new function() {
 		/* level data */
 		var map = [];        /* row, column */
 		var map_end = -1;    /* last cached row */
-		var map_width = 60;  /* width of the map in tiles */
+		var map_width = 60;  /* width of the map in tiles, can be overridden by user */
 
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
@@ -678,6 +678,7 @@ var nitroid = new function() {
 
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
+						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);
 
 						/* start game */
 						setInterval(expire, frame_delay);
@@ -688,6 +689,7 @@ var nitroid = new function() {
 
 $(document).ready(function(){
 		nitroid.init('nitroid', {
-				'platform_height': 8
+				'platform_height': 8,
+				'map_width': 50
 		});
 });
