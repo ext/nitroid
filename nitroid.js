@@ -145,19 +145,24 @@ var nitroid = new function() {
 			}
 		];
 
-		var enemy_base_run = function(e) {
+		var enemy_walker = function(e, speed) {
 			e.animation_data.frame += animation_df;
+			if(e.direction == undefined) {
+				e.direction = Math.random() < 0.5 ? -1 : 1;
+			}
 		}
 
 		var enemy_types = [
 			{
 				/* walker */
 				animation: animations.enemy_walker1,
-				life: 20,
 				spawn_cost: 5,
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
+				life: 20,
+				size: new vector(24, 16),
+				speed: 2.0,
 				run: function(e) { /* e : enemy instance */
-					enemy_base_run(e);
+					enemy_walker(e, this.speed);
 				}
 			}
 		]
