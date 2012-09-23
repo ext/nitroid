@@ -185,7 +185,7 @@ var nitroid = new function() {
 		}
 
 		var depth_width = function(y) {
-			return wall_width(y, 1337) - wall_width(y, 0);
+			return map_width - (wall_width(y, 1337) + wall_width(y, 0));
 		}
 
 		var is_row = function(y) {
@@ -487,7 +487,6 @@ var nitroid = new function() {
 										possible_spawns.push(e);
 								}
 							}
-							console.log("possible_spawns: " + spawn_resources + ", " + possible_spawns);
 							while(spawn_resources > 0 && possible_spawns.length > 0) {
 								var s = Math.floor(frand(y) * possible_spawns.length);
 								if(possible_spawns[s].spawn_cost < spawn_resources) {
@@ -509,11 +508,11 @@ var nitroid = new function() {
 								row[x] = tile_at(x, y);
 						}
 						if( spawn_list.length > 0 ) {
-							console.log("Depth width: " + depth_width(y - 1));
 							var spawn_distance = depth_width(y - 1) / spawn_list.length;
+							console.log("spawn_distance: " + spawn_distance);
 							var x = wall_width(y - 1, 0);
 							for( i in spawn_list ) {
-								var e = spawn_list.pop();
+								var e = spawn_list[i];
 								if(row[x] != TILE_EMPTY) {
 									e.position = new vector(x + 0.5, y);
 									enemies.push(e);
