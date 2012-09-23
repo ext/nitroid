@@ -181,6 +181,14 @@ var nitroid = new function() {
 				return y >= 0 ? wall_width_tunnel(y+offset) : wall_width_top(y);
 		}
 
+		var depth_width = function(y) {
+			return wall_width(y, 1337) - wall_width(y, 0);
+		}
+
+		var is_row = function(y) {
+				return (y > 1 && y % platform_height == 0);
+		}
+
 		/**
 		 * Tell what tile is at the given coordinate.
 		 */
@@ -189,13 +197,12 @@ var nitroid = new function() {
 				var w2 = wall_width(y, 1337);
 
 				var is_wall = x < w1 || x >= (map_width - w2);
-				var is_row = y > 1 && y % platform_height == 0;
 
 				if ( is_wall ){
 						return TILE_WALL + Math.floor(frand(y*52 + x*19) * 6);
 				}
 
-				if ( is_row ){
+				if ( is_row (y) ){
 						/* Use platform tiles in an incremental way */
 						var t = TILE_PLATFORM + (x - w1) % 7;
 
