@@ -150,6 +150,14 @@ var nitroid = new function() {
 			if(e.direction == undefined) {
 				e.direction = Math.random() < 0.5 ? -1 : 1;
 			}
+			var movement = e.direction * speed * dt;
+			var new_pos = e.position;
+			new_pos.x += movement;
+			if(enemy_collision_test(e, new_pos)) {
+				e.direction *= -1;
+			} else {
+				e.position = new_pos;
+			}
 		}
 
 		var enemy_types = [
@@ -159,7 +167,6 @@ var nitroid = new function() {
 				spawn_cost: 5,
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 20,
-				size: new vector(24, 16),
 				speed: 2.0,
 				run: function(e) { /* e : enemy instance */
 					enemy_walker(e, this.speed);
@@ -254,6 +261,17 @@ var nitroid = new function() {
 		 */
 		var player_collision_test = function(x, y){
 				return collision_test(x - player_width2 / tile_width, y, player_width/tile_width, -player_height/tile_height);
+		}
+
+		/**
+		 * Collision test for a enemy with a given position
+		 */
+		var enemy_collision_test = function(enemy, position) {
+			var size = enemy_types[enemy.type].animation.tile_size;
+			return collision_test(
+				position.x /*- size.x/( 2.0 * tile_width)*/, position.y - 0.5,
+				size.x/tile_width, -size.y/tile_height
+			);
 		}
 
 		var update_player_movement = function(){
@@ -514,12 +532,11 @@ var nitroid = new function() {
 						}
 						if( spawn_list.length > 0 ) {
 							var spawn_distance = depth_width(y - 1) / spawn_list.length;
-							console.log("spawn_distance: " + spawn_distance);
 							var x = wall_width(y - 1, 0);
 							for( i in spawn_list ) {
 								var e = spawn_list[i];
 								if(row[x] != TILE_EMPTY) {
-									e.position = new vector(x + 0.5, y);
+									e.position = new vector(x + 0.5 + frand(y * 4711.0), y);
 									enemies.push(e);
 								}
 								x += spawn_distance;
