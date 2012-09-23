@@ -133,7 +133,7 @@ var nitroid = new function() {
 				tile_size: new vector(24, 18),
 				frames: 6
 			}
-		}
+		};
 
 		var projectile_types = [
 			{
@@ -145,7 +145,7 @@ var nitroid = new function() {
 		];
 
 		var enemy_base_run = function(e) {
-			e.animation_data.frames += animation_df;
+			e.animation_data.frame += animation_df;
 		}
 
 		var enemy_types = [
