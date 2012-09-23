@@ -14,6 +14,7 @@ var nitroid = new function() {
 		var player_speed = 5.0;        /* how fast the player moves horizontally */
 		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
 		var bomb_blast = 20;           /* blast radius */
+		var depth_spawn_resource_factor = 1.0; /* Number to multiply depth with to get spawn resources */1.0; /* Number to multiply depth with to get spawn resources */
 
 		var width = 0;
 		var height = 0;
@@ -153,6 +154,8 @@ var nitroid = new function() {
 				/* walker */
 				animation: animations.enemy_walker1,
 				life: 20,
+				spawn_cost: 1,
+				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				run: function(e) { /* e : enemy instance */
 					enemy_base_run(e);
 				}
@@ -470,9 +473,53 @@ var nitroid = new function() {
 						if(y < 0) continue;
 						var row = new Array(map_width);
 
-						/* raw values */
+						var spawn_list = [];
+						if( is_row(y) ) {
+							var spawn_resources = y * depth_spawn_resource_factor;
+							console.log("spawn resources: " + spawn_resources);
+							var possible_spawns = [];
+							for( i in enemy_types) {
+								var e = enemy_types[i];
+								console.log(e);
+								if(e.spawn_cost < spawn_resources && 
+									e.spawn_depth[0] <= depth && 
+									( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth)) {
+										possible_spawns.push(e);
+								}
+							}
+							console.log("possible_spawns: " + spawn_resources + ", " + possible_spawns);
+							while(spawn_resources > 0 && possible_spawns.length > 0) {
+								var s = Math.floor(frand(y) * possible_spawns.length);
+								if(possible_spawns[s].spawn_cost < spawn_resources) {
+									spawn_resources -= possible_spawns[i].spawn_cost;
+									spawn_list.push({
+										/* position:  - set later */
+										type: s,
+										life: possible_spawns[s].life,
+										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: 1}
+									});
+								} else {
+									possible_spawns.splice(s, 1);
+								}
+							}
+							console.log(spawn_list);
+						}
+
 						for ( var x = 0; x < map_width; x++ ){
 								row[x] = tile_at(x, y);
+						}
+						if( spawn_list.length > 0 ) {
+							console.log("Depth width: " + depth_width(y - 1));
+							var spawn_distance = depth_width(y - 1) / spawn_list.length;
+							var x = wall_width(y - 1, 0);
+							for( i in spawn_list ) {
+								var e = spawn_list.pop();
+								if(row[x] != TILE_EMPTY) {
+									e.position = new vector(x + 0.5, y);
+									enemies.push(e);
+								}
+								x += spawn_distance;
+							}
 						}
 
 						/* detect edges */
@@ -557,6 +604,18 @@ var nitroid = new function() {
 			context.restore();
 		}
 
+		var render_enemies = function() {
+			for(i in enemies) {
+				var e = enemies[i];
+				var position = new vector(e.position.x * tile_width, ( e.position.y - depth + y_screencenter) * tile_height - e.animation_data.animation.tile_size.y * 0.5);
+				context.save();
+				context.translate(position.x, position.y);
+				render_animation(e.animation_data);
+				context.restore();
+
+			}
+		}
+
 		var render_bombs = function(){
 				for ( i in bombs ){
 						var size = 10;
@@ -607,6 +666,7 @@ var nitroid = new function() {
 				context.translate(-xcam * tile_width, 0);
 
 				render_player();
+				render_enemies();
 				render_bombs();
 				render_projectiles();
 
