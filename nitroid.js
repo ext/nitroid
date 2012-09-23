@@ -154,7 +154,7 @@ var nitroid = new function() {
 				/* walker */
 				animation: animations.enemy_walker1,
 				life: 20,
-				spawn_cost: 1,
+				spawn_cost: 5,
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				run: function(e) { /* e : enemy instance */
 					enemy_base_run(e);
