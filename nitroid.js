@@ -24,7 +24,7 @@ var nitroid = new function() {
 		var tile_width = 32;
 		var tile_height = 32;
 		var projectile_width = 16;		 /* width of a projectile */
-		var projectile_height = 16;		 /* height of a projectile */
+		var projectile_height = 10;		 /* height of a projectile */
 		var projectile_spawn_offset = 1.0;
 		var pos = 8;
 		var depth = 0.0;
@@ -126,8 +126,8 @@ var nitroid = new function() {
 				frames: 1
 			},
 			missile: {
-				tile_start: new vector(544, 49),
-				tile_size: new vector(16, 16),
+				tile_start: new vector(544, 52),
+				tile_size: new vector(16, 10),
 				frames: 1
 			},
 			enemy_walker1: {
@@ -335,7 +335,7 @@ var nitroid = new function() {
 		var fire_projectile = function() {
 			var p = {
 				type: selected_projectile_type,
-				pos: new vector(pos, depth - (player_height * (crouching ? 0.35 : 0.6)) / tile_height),
+				pos: new vector(pos, depth - (player_height * (crouching ? 0.3 : 0.6)) / tile_height),
 				rotation: player_horizontal_direction == -1 ? Math.PI : 0,
 				velocity: new vector(player_horizontal_direction, 0),
 				frame: 0,
