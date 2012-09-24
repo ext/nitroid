@@ -23,8 +23,6 @@ var nitroid = new function() {
 		var y_screencenter = 0;
 		var tile_width = 32;
 		var tile_height = 32;
-		var projectile_width = 16;		 /* width of a projectile */
-		var projectile_height = 10;		 /* height of a projectile */
 		var projectile_spawn_offset = 1.0;
 		var pos = 8;
 		var depth = 0.0;
@@ -404,7 +402,8 @@ var nitroid = new function() {
 				} else {
 					p.frame += animation_df;
 					p.pos = p.pos.add(p.velocity.multiply(dt));
-					if(collision_test(p.pos.x, p.pos.y, projectile_width / tile_width, projectile_height / tile_height)) {
+					var hit = collision_test(p.pos.x, p.pos.y, animations.missile.tile_size.x / tile_width, animations.missile.tile_size.y / tile_height);
+					if(hit) {
 						projectiles[i].explode = 1.2;
 						var blast = projectile_types[p.type].blast;
 						sx = Math.ceil(blast / horizontal_tiles);
