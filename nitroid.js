@@ -23,7 +23,7 @@ var nitroid = new function() {
 		var y_screencenter = 0;
 		var tile_width = 32;
 		var tile_height = 32;
-		var projectile_spawn_offset = 1.0;
+		var projectile_spawn_offset = 0.5;
 		var pos = 8;
 		var depth = 0.0;
 		var crouching = false;
@@ -364,6 +364,11 @@ var nitroid = new function() {
 			p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
 
 			projectiles.push(p);
+
+			var hit = collision_test(p.pos.x, p.pos.y, animations.missile.tile_size.x / tile_width, animations.missile.tile_size.y / tile_height);
+			if(hit) {
+				explode_projectile(i);
+			}
 		}
 
 		var update_bombs = function(){
