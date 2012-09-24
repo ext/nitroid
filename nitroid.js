@@ -28,6 +28,7 @@ var nitroid = new function() {
 		var projectile_spawn_offset = 1.0;
 		var pos = 8;
 		var depth = 0.0;
+		var crouching = false;
 		var depth_min = 0.0;
 		var depth_scale = 0.4;         /* scaling factor when showing depth on hud */
 		var key = [];
@@ -116,6 +117,11 @@ var nitroid = new function() {
 			},
 			player_aim_down: {
 				tile_start: new vector(49*10, 108.0),
+				tile_size: new vector(49, 40),
+				frames: 1
+			},
+			player_crouch: {
+				tile_start: new vector(49*11, 108.0),
 				tile_size: new vector(49, 40),
 				frames: 1
 			},
@@ -246,11 +252,21 @@ var nitroid = new function() {
 					} else {
 						player_animation.animation = animations.player_run_aim_forward;
 					}
+					crouching = false;
 				} else if(key[KEY_UP]) {
 					player_animation.animation = animations.player_aim_up;
 					player_animation.frame = 0;
+					crouching = false;
 				} else if(key[KEY_DOWN]) {
 					player_animation.animation = animations.player_aim_down;
+					player_animation.frame = 0;
+
+					var touching_floor = player_collision_test(pos, depth);
+					if ( player_collision_test(pos, depth) ){
+						crouching = true;
+					}
+				} else if ( crouching ){
+					player_animation.animation = animations.player_crouch;
 					player_animation.frame = 0;
 				} else {
 					player_animation.animation = animations.player_aim_forward;
@@ -281,6 +297,7 @@ var nitroid = new function() {
 		var update_player_gravity = function(){
 				var new_depth = depth;
 				if ( can_jump > 0 && key[KEY_JUMP] ){
+						crouching = false;
 						if ( can_jump > player_jump_threshold ){
 								new_depth = Math.max(depth - player_jump * dt, depth_min);
 						}
@@ -318,7 +335,7 @@ var nitroid = new function() {
 		var fire_projectile = function() {
 			var p = {
 				type: selected_projectile_type,
-				pos: new vector(pos, depth - (player_height * 0.5) / tile_height ),
+				pos: new vector(pos, depth - (player_height * (crouching ? 0.35 : 0.6)) / tile_height),
 				rotation: player_horizontal_direction == -1 ? Math.PI : 0,
 				velocity: new vector(player_horizontal_direction, 0),
 				frame: 0,
