@@ -390,6 +390,25 @@ var nitroid = new function() {
 				}
 		}
 
+		var explode_projectile = function(i){
+				projectiles[i].explode = 1.2;
+				var blast = projectile_types[projectiles[i].type].blast;
+				sx = Math.ceil(blast / horizontal_tiles);
+				sy = Math.ceil(blast / vertical_tiles);
+				for ( var y = -sy; y < sy; y++ ){
+						var py = Math.round(projectiles[i].pos.y) + y;
+						for ( var x = -sx; x < sx; x++ ){
+								var px = Math.round(projectiles[i].pos.x) + x;
+								if ( px < 0 || py < 0 ) continue;
+								var tile = map[py][px];
+								if ( tile == -1 ) continue;
+								if ( tile >= 8 && tile < 16 ){
+										map[py][px] = -1;
+								}
+						}
+				}
+		}
+
 		var update_projectiles = function() {
 			for (i in projectiles) {
 				var p = projectiles[i];
@@ -404,22 +423,7 @@ var nitroid = new function() {
 					p.pos = p.pos.add(p.velocity.multiply(dt));
 					var hit = collision_test(p.pos.x, p.pos.y, animations.missile.tile_size.x / tile_width, animations.missile.tile_size.y / tile_height);
 					if(hit) {
-						projectiles[i].explode = 1.2;
-						var blast = projectile_types[p.type].blast;
-						sx = Math.ceil(blast / horizontal_tiles);
-						sy = Math.ceil(blast / vertical_tiles);
-						for ( var y = -sy; y < sy; y++ ){
-								var py = Math.round(p.pos.y) + y;
-								for ( var x = -sx; x < sx; x++ ){
-										var px = Math.round(p.pos.x) + x;
-										if ( px < 0 || py < 0 ) continue;
-										var tile = map[py][px];
-										if ( tile == -1 ) continue;
-										if ( tile >= 8 && tile < 16 ){
-												map[py][px] = -1;
-										}
-								}
-						}
+						explode_projectile(i);
 					}
 				}
 			}
