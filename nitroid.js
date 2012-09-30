@@ -137,6 +137,7 @@ var nitroid = new function() {
 				frames: 6
 			}
 		};
+		/* animation_data: animation, frame, facing, alpha */
 
 		var projectile_types = [
 			{
@@ -179,7 +180,7 @@ var nitroid = new function() {
 
 		var enemies = []; /* position, type, life, animation_data */
 
-		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1};
+		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1, alpha: 1.0};
 
 		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
@@ -615,7 +616,7 @@ var nitroid = new function() {
 										/* position:  - set later */
 										type: s,
 										life: possible_spawns[s].life,
-										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: 1}
+										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: 1, alpha: 1.0}
 									});
 								} else {
 									possible_spawns.splice(s, 1);
@@ -703,6 +704,7 @@ var nitroid = new function() {
 			var sy = a.tile_start.y;
 			context.save();
 			context.scale(animation_data.facing, 1);
+			context.globalAlpha = animation_data.alpha;
 			context.drawImage(animation_tiles,
 												sx, sy,                   /* src */
 												a.tile_size.x, a.tile_size.y,  /* src size */
@@ -759,7 +761,7 @@ var nitroid = new function() {
 					context.fillRect(-blast * 0.5, -blast * 0.5, blast, blast);
 				} else {
 					context.rotate(projectiles[i].rotation);
-					render_animation({ animation: projectile_types[projectiles[i].type].animation, frame: projectiles[i].frame, facing: 1});
+					render_animation({ animation: projectile_types[projectiles[i].type].animation, frame: projectiles[i].frame, facing: 1, alpha: 1.0});
 				}
 				context.restore();
 			}
