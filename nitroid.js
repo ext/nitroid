@@ -457,7 +457,9 @@ var nitroid = new function() {
 						if ( dir > 0 ){
 								/* landing on floor */
 								depth = Math.floor(new_depth);
-								can_jump = player_jump_steps;
+								if ( !key[KEY_JUMP] ){
+									can_jump = player_jump_steps;
+								}
 						} else {
 								/* jumping onto ceiling (subtracting 0.99 because 1.0 would collide with tile) */
 								depth = Math.floor(new_depth) - 0.99 + player_height / tile_height;
