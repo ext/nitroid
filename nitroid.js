@@ -39,6 +39,9 @@ var nitroid = new function() {
 		var player_offset  = player_width / tile_width * 0.5;
 		var player_life = 100.0;
 		var enemies_despawn_distance = 10; //distance from screen edge
+		var player_rof = 1000 / 5;
+		var last_fire = 0;
+		var t = 0;
 
 		/* camera */
 		var xcam = 0;
@@ -484,6 +487,9 @@ var nitroid = new function() {
 		}
 
 		var player_fire_projectile = function() {
+			if ( (t-last_fire) < player_rof ) return;
+			last_fire = t;
+
 			var p = {
 				type: selected_projectile_type,
 				pos: new vector(pos, depth - (player_height * (crouching ? 0.3 : 0.6)) / tile_height),
@@ -625,6 +631,8 @@ var nitroid = new function() {
 		}
 
 		var update = function(){
+				t = (new Date().getTime());
+
 				update_player();
 				update_player_movement();
 				update_player_gravity();
