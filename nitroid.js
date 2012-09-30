@@ -15,6 +15,8 @@ var nitroid = new function() {
 		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
 		var bomb_blast = 20;           /* blast radius */
 		var depth_spawn_resource_factor = 1.0; /* Number to multiply depth with to get spawn resources */1.0; /* Number to multiply depth with to get spawn resources */
+		var hiscore_url = null;
+		var hiscore_user = null;
 
 		var width = 0;
 		var height = 0;
@@ -625,6 +627,18 @@ var nitroid = new function() {
 			if(player_life <= 0) {
 					gameover = true;
 					$(wrapper).prepend('<div class="gameover"><p>Game Over</p></div>');
+
+					if ( hiscore_url ){
+							$.ajax({
+									url: hiscore_url,
+									type: 'POST',
+									dataType: 'json',
+									data: {
+											user: hiscore_user,
+											depth: scaled_depth()
+									},
+							});
+					}
 			}
 			if(player_animation.blink > 0.0) {
 				player_animation.blink -= blink_dt;
@@ -832,8 +846,12 @@ var nitroid = new function() {
 			}
 		}
 
+		var scaled_depth = function(){
+				return Math.max(Math.floor((depth + y_screencenter)*depth_scale), 0);
+		}
+
 		var render_hud = function(){
-				var text = "Depth: " + Math.max(Math.floor((depth + y_screencenter)*depth_scale), 0) + "m";
+				var text = "Depth: " + scaled_depth() + "m";
 				context.font = "bold 15px monospace";
 				context.fillStyle = '#000';
 				context.fillText(text, 7, 17);
@@ -969,6 +987,8 @@ var nitroid = new function() {
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
 						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);
+						if ( 'hiscore_url' in params ) hiscore_url = params['hiscore_url'];
+						if ( 'hiscore_user' in params ) hiscore_user = params['hiscore_user'];
 
 						/* start game */
 						setInterval(expire, frame_delay);
