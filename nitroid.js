@@ -49,7 +49,7 @@ var nitroid = new function() {
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
 		var bombs = [];
-		var projectiles = [];	/* projectile: pos, velocity, rotation, type, frame */
+		var projectiles = [];	/* projectile: pos, velocity, rotation, type, frame, hostile(bool) */
 		var selected_projectile_type = 0;
 		var player_horizontal_direction = 1; /* -1 or 1 (left or right)  */
 
@@ -139,7 +139,7 @@ var nitroid = new function() {
 		var projectile_types = [
 			{
 				animation: animations.missile,
-				damage: 1.0,
+				damage: 20.0,
 				speed: 9.0,
 				blast: 20.0
 			}
@@ -256,6 +256,49 @@ var nitroid = new function() {
 				return false;
 		}
 
+		var projectile_aabb = function(p, bcenter, bsize) {
+			var ts = new vector(tile_width, tile_height);
+			var apos = p.pos.vec_multiply(ts);
+			var bcenter = bcenter.vec_multiply(ts);
+
+			var asize = projectile_types[p.type].animation.tile_size;
+			var bhalf = bsize.multiply(0.5);
+
+			var amin = apos;
+			var bmin = bcenter.minus(bhalf);
+
+			var amax  = apos.add(asize);
+			var bmax  = bcenter.add(bhalf);
+
+			if(amax.x < bmin.x || amin.x > bmax.x) return false;
+			if(amax.y < bmin.y || amin.y > bmax.y) return false;
+
+			return true;
+		}
+
+		/**
+		 * Collision test for projectile with entities
+		 *
+		 * @param: p projectile
+		 */
+		var projectile_entity_collision_test = function(p) {
+			if(p.hostile) {
+				//Collision test with player
+			} else {
+				//Collision test with all enemies
+				var hit = false;
+				for(i in enemies) {
+					var e = enemies[i];
+					var size = enemy_types[e.type].animation.tile_size;
+					if(projectile_aabb(p, e.position, size)) {
+						enemies[i].life -= projectile_types[p.type].damage;
+						hit = true;
+					}
+				}
+				return hit;
+			}
+		}
+
 		/**
 		 * Same as collision_test but with offsets and size automatically added.
 		 */
@@ -363,13 +406,14 @@ var nitroid = new function() {
 				});
 		}
 
-		var fire_projectile = function() {
+		var player_fire_projectile = function() {
 			var p = {
 				type: selected_projectile_type,
 				pos: new vector(pos, depth - (player_height * (crouching ? 0.3 : 0.6)) / tile_height),
 				rotation: player_horizontal_direction == -1 ? Math.PI : 0,
 				velocity: new vector(player_horizontal_direction, 0),
 				frame: 0,
+				hostile: false,
 				explode: 0 /* Not currently exploding */
 			};
 			if(key[KEY_UP] && key[KEY_LEFT]) {
@@ -397,11 +441,11 @@ var nitroid = new function() {
 			p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
 
 			projectiles.push(p);
-
+/*
 			var hit = collision_test(p.pos.x, p.pos.y, animations.missile.tile_size.x / tile_width, animations.missile.tile_size.y / tile_height);
 			if(hit) {
 				explode_projectile(i);
-			}
+			}*/
 		}
 
 		var update_bombs = function(){
@@ -448,7 +492,7 @@ var nitroid = new function() {
 		}
 
 		var update_projectiles = function() {
-			for (i in projectiles) {
+			for (var i in projectiles) {
 				var p = projectiles[i];
 				if(projectiles[i].explode > 0) {
 					projectiles[i].explode -= dt;
@@ -459,7 +503,10 @@ var nitroid = new function() {
 				} else {
 					p.frame += animation_df;
 					p.pos = p.pos.add(p.velocity.multiply(dt));
-					var hit = collision_test(p.pos.x, p.pos.y, animations.missile.tile_size.x / tile_width, animations.missile.tile_size.y / tile_height);
+					var hit = projectile_entity_collision_test(p) 
+					|| collision_test(p.pos.x, p.pos.y, 
+														animations.missile.tile_size.x / tile_width,
+														animations.missile.tile_size.y / tile_height);
 					if(hit) {
 						explode_projectile(i);
 					}
@@ -469,8 +516,12 @@ var nitroid = new function() {
 
 		var update_enemies = function() {
 			for(i in enemies) {
-				var type = enemy_types[enemies[i].type];
-				type.run(enemies[i]);
+				if(enemies[i].life <= 0) {
+					enemies.splice(i, 1);
+				} else {
+					var type = enemy_types[enemies[i].type];
+					type.run(enemies[i]);
+				}
 			}
 		}
 
@@ -499,11 +550,9 @@ var nitroid = new function() {
 						var spawn_list = [];
 						if( is_row(y) ) {
 							var spawn_resources = y * depth_spawn_resource_factor;
-							console.log("spawn resources: " + spawn_resources);
 							var possible_spawns = [];
 							for( i in enemy_types) {
 								var e = enemy_types[i];
-								console.log(e);
 								if(e.spawn_cost < spawn_resources && 
 									e.spawn_depth[0] <= depth && 
 									( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth)) {
@@ -524,7 +573,6 @@ var nitroid = new function() {
 									possible_spawns.splice(s, 1);
 								}
 							}
-							console.log(spawn_list);
 						}
 
 						for ( var x = 0; x < map_width; x++ ){
@@ -723,7 +771,7 @@ var nitroid = new function() {
 						break;
 				case KEY_FIRE:
 						if ( state ) {
-								fire_projectile();
+								player_fire_projectile();
 						}
 						break;
 

@@ -6,12 +6,16 @@ function vector(x_, y_) {
 		return new vector(this.x + v.x, this.y + v.y);
 	}
 
-	this.subtract = function(v) {
+	this.minus = function(v) {
 		return new vector(this.x - v.x, this.y - v.y);
 	}
 
 	this.multiply = function(s) {
 		return new vector(this.x * s, this.y * s);
+	}
+
+	this.vec_multiply = function(v) {
+		return new vector(this.x * v.x, this.y * v.y);
 	}
 
 	this.dot = function(v) {
