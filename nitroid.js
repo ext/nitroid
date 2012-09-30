@@ -298,8 +298,10 @@ var nitroid = new function() {
 		}
 
 		var damage_player = function(dmg) {
-			player_life -= dmg;
-			player_animation.blink = 2.0;
+			if(player_animation.blink < 0.01) {
+				player_life -= dmg;
+				player_animation.blink = 1.5;
+			}
 		}
 
 		var projectile_aabb = function(p, bcenter_ts, bsize) {
