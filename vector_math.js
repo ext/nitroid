@@ -18,6 +18,10 @@ function vector(x_, y_) {
 		return new vector(this.x * v.x, this.y * v.y);
 	}
 
+	this.vec_divide = function(v) {
+		return new vector(this.x / v.x, this.y / v.y);
+	}
+
 	this.dot = function(v) {
 		return this.x * v.x + this.y * v.y;
 	}

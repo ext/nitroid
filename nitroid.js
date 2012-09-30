@@ -24,6 +24,7 @@ var nitroid = new function() {
 		var y_screencenter = 0;
 		var tile_width = 32;
 		var tile_height = 32;
+		var tile_size = new vector(tile_width, tile_height);
 		var projectile_spawn_offset = 0.5;
 		var pos = 8;
 		var depth = 0.0;
@@ -257,24 +258,38 @@ var nitroid = new function() {
 				return false;
 		}
 
-		var projectile_aabb = function(p, bcenter, bsize) {
-			var ts = new vector(tile_width, tile_height);
-			var apos = p.pos.vec_multiply(ts);
-			var bcenter = bcenter.vec_multiply(ts);
+		/**
+		 * AABB - AABB collision test between a and b
+		 *
+		 * @param acenter_ts: a center, in tile space
+		 * @param asize: a size, in pixels
+		 * @param bcenter_ts: b center, in tile space
+		 * @param bsize: b size, in pixels
+		 */
+		var aabb_aabb = function(acenter_ts, asize, bcenter_ts, bsize) {
+			var acenter = acenter_ts.vec_multiply(tile_size);
+			var bcenter = bcenter_ts.vec_multiply(tile_size);
 
-			var asize = projectile_types[p.type].animation.tile_size;
+			var ahalf = asize.multiply(0.5);
 			var bhalf = bsize.multiply(0.5);
 
-			var amin = apos;
+			var amin = acenter.minus(ahalf);
 			var bmin = bcenter.minus(bhalf);
 
-			var amax  = apos.add(asize);
+			var amax  = acenter.add(ahalf);
 			var bmax  = bcenter.add(bhalf);
 
 			if(amax.x < bmin.x || amin.x > bmax.x) return false;
 			if(amax.y < bmin.y || amin.y > bmax.y) return false;
 
 			return true;
+		}
+
+		var projectile_aabb = function(p, bcenter_ts, bsize) {
+			var asize = projectile_types[p.type].animation.tile_size
+			var ahalf_ts = asize.multiply(0.5).vec_divide(tile_size);
+			var acenter_ts = p.pos.add(ahalf_ts);
+			return aabb_aabb(acenter_ts, asize, bcenter_ts, bsize);
 		}
 
 		/**
