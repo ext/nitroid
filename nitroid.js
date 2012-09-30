@@ -170,6 +170,7 @@ var nitroid = new function() {
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 20,
 				speed: 2.0,
+				touch_damage: 1.0,
 				run: function(e) { /* e : enemy instance */
 					enemy_walker(e, this.speed);
 				}
@@ -285,12 +286,27 @@ var nitroid = new function() {
 			return true;
 		}
 
+		var player_pos = function() {
+			return new vector(pos, depth - player_height2  / tile_height);
+		}
+
+		var player_size = function() {
+			return new vector(player_width, player_height);
+		}
+
+		var damage_player = function(dmg) {
+			player_life -= dmg;
+			//TODO: Blink player
+			console.log("Player took damage");
+		}
+
 		var projectile_aabb = function(p, bcenter_ts, bsize) {
 			var asize = projectile_types[p.type].animation.tile_size
 			var ahalf_ts = asize.multiply(0.5).vec_divide(tile_size);
 			var acenter_ts = p.pos.add(ahalf_ts);
 			return aabb_aabb(acenter_ts, asize, bcenter_ts, bsize);
 		}
+
 
 		/**
 		 * Collision test for projectile with entities
@@ -300,10 +316,8 @@ var nitroid = new function() {
 		var projectile_entity_collision_test = function(p) {
 			if(p.hostile) {
 				//Collision test with player
-				var pos = new vector(pos, depth - player_height2  / tile_height);
-				var size = new vector(player_width, player_height);
-				if( projectile_aabb(p, pos, size) ) {
-					player_life -= projectile_types[p.type].damage;
+				if( projectile_aabb(p, player_pos(), player_size()) ) {
+					damage_player(projectile_types[p.type].damage);
 					return true;
 				} else {
 					return false;
@@ -328,6 +342,10 @@ var nitroid = new function() {
 		 */
 		var player_collision_test = function(x, y){
 				return collision_test(x - player_width2 / tile_width, y, player_width/tile_width, -player_height/tile_height);
+		}
+
+		var player_enemy_collision_test = function(e) {
+			return aabb_aabb(player_pos(), player_size(), enemies[i].position, enemy_types[e.type].animation.tile_size);
 		}
 
 		/**
@@ -548,6 +566,9 @@ var nitroid = new function() {
 				} else {
 					var type = enemy_types[enemies[i].type];
 					type.run(enemies[i]);
+					if(player_enemy_collision_test(enemies[i])) {
+						damage_player(type.touch_damage);
+					}
 				}
 			}
 		}
