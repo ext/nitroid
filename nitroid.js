@@ -36,6 +36,7 @@ var nitroid = new function() {
 		var player_width2 = player_width * 0.5;
 		var player_height2 = player_height * 0.5;
 		var player_offset  = player_width / tile_width * 0.5;
+		var player_life = 100.0;
 
 		/* camera */
 		var xcam = 0;
@@ -284,6 +285,14 @@ var nitroid = new function() {
 		var projectile_entity_collision_test = function(p) {
 			if(p.hostile) {
 				//Collision test with player
+				var pos = new vector(pos, depth - player_height2  / tile_height);
+				var size = new vector(player_width, player_height);
+				if( projectile_aabb(p, pos, size) ) {
+					player_life -= projectile_types[p.type].damage;
+					return true;
+				} else {
+					return false;
+				}
 			} else {
 				//Collision test with all enemies
 				var hit = false;
