@@ -38,6 +38,7 @@ var nitroid = new function() {
 		var player_height2 = player_height * 0.5;
 		var player_offset  = player_width / tile_width * 0.5;
 		var player_life = 100.0;
+		var enemies_despawn_distance = 10; //distance from screen edge
 
 		/* camera */
 		var xcam = 0;
@@ -564,8 +565,10 @@ var nitroid = new function() {
 		}
 
 		var update_enemies = function() {
+			var despawn_depth = depth - y_screencenter - enemies_despawn_distance;
 			for(i in enemies) {
-				if(enemies[i].life <= 0) {
+				if(enemies[i].life <= 0 || enemies[i].position.y <= despawn_depth) {
+					console.log("Remove enemy at depth " + enemies[i].position.y);
 					enemies.splice(i, 1);
 				} else {
 					if(enemies[i].animation_data.blink > 0.0) {
