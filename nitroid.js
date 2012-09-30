@@ -441,11 +441,14 @@ var nitroid = new function() {
 			p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
 
 			projectiles.push(p);
-/*
-			var hit = collision_test(p.pos.x, p.pos.y, animations.missile.tile_size.x / tile_width, animations.missile.tile_size.y / tile_height);
+
+			var hit = projectile_entity_collision_test(p) 
+			|| collision_test(p.pos.x, p.pos.y, 
+												animations.missile.tile_size.x / tile_width,
+												animations.missile.tile_size.y / tile_height);
 			if(hit) {
-				explode_projectile(i);
-			}*/
+				explode_projectile(projectiles.length - 1);
+			}
 		}
 
 		var update_bombs = function(){
