@@ -436,7 +436,7 @@ var nitroid = new function() {
 					player_animation.frame += animation_df;
 				}
 
-				if ( !player_collision_test(new_pos, depth-1e-9) ){
+				if ( !player_collision_test(new_pos, depth-1e-9) && new_pos >= 0 && new_pos <= (map_width - player_width/tile_width) ){
 						pos = new_pos;
 				}
 		}
