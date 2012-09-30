@@ -62,6 +62,7 @@ var nitroid = new function() {
 		var dt = 1.0 / fps;
 		var animation_fps = 10;
 		var animation_df = dt * animation_fps;
+		var blink_dt = 0.1;
 
 		/* constants */
 		var TILE_EMPTY = -1;
@@ -137,7 +138,7 @@ var nitroid = new function() {
 				frames: 6
 			}
 		};
-		/* animation_data: animation, frame, facing, alpha */
+		/* animation_data: animation, frame, facing, blink */ //blink: 0 -> 2.0 (0: solid, 1.0: transparent, 2.0: solid)
 
 		var projectile_types = [
 			{
@@ -181,7 +182,7 @@ var nitroid = new function() {
 
 		var enemies = []; /* position, type, life, animation_data */
 
-		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1, alpha: 1.0};
+		var player_animation = {animation: animations.player_aim_forward, frame: 0, facing: 1, blink: 0.0};
 
 		/* for constant v it returns a deterministic quasi-random number between 0.0 - 1.0 */
 		var frand = function(v){
@@ -298,8 +299,7 @@ var nitroid = new function() {
 
 		var damage_player = function(dmg) {
 			player_life -= dmg;
-			//TODO: Blink player
-			console.log("Player took damage");
+			player_animation.blink = 2.0;
 		}
 
 		var projectile_aabb = function(p, bcenter_ts, bsize) {
@@ -566,6 +566,10 @@ var nitroid = new function() {
 				if(enemies[i].life <= 0) {
 					enemies.splice(i, 1);
 				} else {
+					if(enemies[i].animation_data.blink > 0.0) {
+						enemies[i].animation_data.blink -= blink_dt;
+						if(enemies[i].animation_data.blink < 0) enemies[i].animation_data.blink = 0.0;
+					}
 					var type = enemy_types[enemies[i].type];
 					type.run(enemies[i]);
 					if(player_enemy_collision_test(enemies[i])) {
@@ -575,7 +579,18 @@ var nitroid = new function() {
 			}
 		}
 
+		var update_player = function() {
+			if(player_life <= 0) {
+				console.log("GAME FUCKING OVER!\n");
+			}
+			if(player_animation.blink > 0.0) {
+				player_animation.blink -= blink_dt;
+				if(player_animation.blink < 0) player_animation.blink = 0.0;
+			}
+		}
+
 		var update = function(){
+				update_player();
 				update_player_movement();
 				update_player_gravity();
 				update_camera();
@@ -617,7 +632,7 @@ var nitroid = new function() {
 										/* position:  - set later */
 										type: s,
 										life: possible_spawns[s].life,
-										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: 1, alpha: 1.0}
+										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: 1, blink: 0.0}
 									});
 								} else {
 									possible_spawns.splice(s, 1);
@@ -705,7 +720,7 @@ var nitroid = new function() {
 			var sy = a.tile_start.y;
 			context.save();
 			context.scale(animation_data.facing, 1);
-			context.globalAlpha = animation_data.alpha;
+			context.globalAlpha = Math.abs(1.0 - animation_data.blink);
 			context.drawImage(animation_tiles,
 												sx, sy,                   /* src */
 												a.tile_size.x, a.tile_size.y,  /* src size */
@@ -762,7 +777,7 @@ var nitroid = new function() {
 					context.fillRect(-blast * 0.5, -blast * 0.5, blast, blast);
 				} else {
 					context.rotate(projectiles[i].rotation);
-					render_animation({ animation: projectile_types[projectiles[i].type].animation, frame: projectiles[i].frame, facing: 1, alpha: 1.0});
+					render_animation({ animation: projectile_types[projectiles[i].type].animation, frame: projectiles[i].frame, facing: 1, blink: 0.0});
 				}
 				context.restore();
 			}
