@@ -173,7 +173,7 @@ var nitroid = new function() {
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 20,
 				speed: 2.0,
-				touch_damage: 1.0,
+				touch_damage: 10.0,
 				run: function(e) { /* e : enemy instance */
 					enemy_walker(e, this.speed);
 				}
@@ -792,6 +792,13 @@ var nitroid = new function() {
 				context.fillText(text, 7, 17);
 				context.fillStyle = '#ff0';
 				context.fillText(text, 5, 15);
+
+				text = "Life: " + player_life;
+				context.font = "bold 15px monospace";
+				context.fillStyle = '#000';
+				context.fillText(text, 7, 34);
+				context.fillStyle = '#ff0';
+				context.fillText(text, 5, 32);
 		}
 
 		var render = function(){
