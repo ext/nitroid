@@ -156,7 +156,8 @@ var nitroid = new function() {
 			var movement = e.direction * speed * dt;
 			var new_pos = e.position;
 			new_pos.x += movement;
-			if(enemy_collision_test(e, new_pos)) {
+			if(enemy_collision_test(e, new_pos)
+				|| !enemy_collision_test(e, new_pos.minus(new vector(0, -1))) ) {
 				e.direction *= -1;
 			} else {
 				e.position = new_pos;
