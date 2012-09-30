@@ -433,8 +433,16 @@ var nitroid = new function() {
 								can_jump = 0;
 						}
 				} else {
-						depth = Math.floor(new_depth);
-						can_jump = player_jump_steps;
+						var dir = new_depth - depth;
+						if ( dir > 0 ){
+								/* landing on floor */
+								depth = Math.floor(new_depth);
+								can_jump = player_jump_steps;
+						} else {
+								/* jumping onto ceiling (subtracting 0.99 because 1.0 would collide with tile) */
+								depth = Math.floor(new_depth) - 0.99 + player_height / tile_height;
+								can_jump = player_jump_threshold;
+						}
 				}
 		}
 
