@@ -77,10 +77,12 @@ var nitroid = new function() {
 		var KEY_RIGHT = 39;
 		var KEY_SPACE = 32;
 		var KEY_CTRL = 17;
+		var KEY_ALT = 18;
 		var KEY_SHIFT = 16;
 		var KEY_DROP = KEY_SHIFT;
 		var KEY_JUMP = KEY_SPACE;
 		var KEY_FIRE = KEY_CTRL;
+		var KEY_HOLD = KEY_ALT;
 
 		var animations = {
 			player_run_aim_forward: {
@@ -373,7 +375,11 @@ var nitroid = new function() {
 					} else {
 						player_animation.animation = animations.player_run_aim_forward;
 					}
-					crouching = false;
+					if ( !key[KEY_HOLD] ){
+						crouching = false;
+					} else if ( crouching ){
+						player_animation.animation = animations.player_crouch;
+					}
 				} else if(key[KEY_UP]) {
 					player_animation.animation = animations.player_aim_up;
 					player_animation.frame = 0;
@@ -392,6 +398,18 @@ var nitroid = new function() {
 				} else {
 					player_animation.animation = animations.player_aim_forward;
 					player_animation.frame = 0;
+				}
+
+				if ( key[KEY_HOLD] ){
+					if ( key[KEY_LEFT] ){
+						player_horizontal_direction = -1;
+						player_animation.facing = -1;
+					}
+					if ( key[KEY_RIGHT] ){
+						player_horizontal_direction = 1;
+						player_animation.facing = 1;
+					}
+					return;
 				}
 
 				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
@@ -847,6 +865,7 @@ var nitroid = new function() {
 				case KEY_LEFT:
 				case KEY_RIGHT:
 				case KEY_SPACE:
+				case KEY_HOLD:
 						key[code] = state;
 						break;
 
