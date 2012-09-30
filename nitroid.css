@@ -5,3 +5,18 @@
     left: 250px;
     background: url('animations.png') no-repeat scroll 0px -2200px transparent;
 }
+
+.gameover {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    left: 350px;
+    top: 115px;
+    text-align: center;
+}
+
+.gameover p {
+    color: #ff0;
+    background: transparent;
+    font: bold 4em monospace;
+}

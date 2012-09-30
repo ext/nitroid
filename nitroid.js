@@ -42,6 +42,7 @@ var nitroid = new function() {
 		var player_rof = 1000 / 5;
 		var last_fire = 0;
 		var t = 0;
+		var gameover = false;
 
 		/* camera */
 		var xcam = 0;
@@ -622,7 +623,8 @@ var nitroid = new function() {
 
 		var update_player = function() {
 			if(player_life <= 0) {
-				console.log("GAME FUCKING OVER!\n");
+					gameover = true;
+					$(wrapper).prepend('<div class="gameover"><p>Game Over</p></div>');
 			}
 			if(player_animation.blink > 0.0) {
 				player_animation.blink -= blink_dt;
@@ -632,6 +634,10 @@ var nitroid = new function() {
 
 		var update = function(){
 				t = (new Date().getTime());
+
+				if ( gameover ){
+						return;
+				}
 
 				update_player();
 				update_player_movement();
