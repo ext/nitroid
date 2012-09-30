@@ -976,10 +976,3 @@ var nitroid = new function() {
 				},
 		};
 }();
-
-$(document).ready(function(){
-		nitroid.init('nitroid', {
-				'platform_height': 8,
-				'map_width': 50
-		});
-});
