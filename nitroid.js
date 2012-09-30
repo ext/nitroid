@@ -249,8 +249,8 @@ var nitroid = new function() {
 		 * x and y is in worldspace.
 		 */
 		var collision_test = function(x, y, w, h){
-				for ( var i = 0; i < 2; i++ ){
-						for ( var j = 0; j < 2; j++ ){
+				for ( var i = 0; i <= 1.0; i += 0.5 ){
+						for ( var j = 0; j <= 1.0; j += 0.25 ){
 								var screen_x = x + w*i;
 								var screen_y = y + h*j;
 								var tile_x = Math.floor(screen_x);
