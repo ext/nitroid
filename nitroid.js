@@ -372,6 +372,8 @@ var nitroid = new function() {
 						player_animation.animation = animations.player_run_aim_diagonal_up;
 					} else if(key[KEY_DOWN]) {
 						player_animation.animation = animations.player_run_aim_diagonal_down
+					} else if ( key[KEY_HOLD] ){
+						player_animation.animation = animations.player_aim_forward;
 					} else {
 						player_animation.animation = animations.player_run_aim_forward;
 					}
