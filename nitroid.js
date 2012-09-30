@@ -946,6 +946,12 @@ var nitroid = new function() {
 								.css('height', height)
 						;
 
+						/* instructions */
+						$(wrapper).prepend('<div class="instructions"></div>');
+						setTimeout(function(){
+								$('.instructions').fadeOut();
+						}, 7000);
+
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
 						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);

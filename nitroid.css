@@ -1,0 +1,7 @@
+.instructions {
+    position: absolute;
+    width: 500px;
+    height: 157px;
+    left: 250px;
+    background: url('animations.png') no-repeat scroll 0px -2200px transparent;
+}
