@@ -888,11 +888,11 @@ var nitroid = new function() {
 		 * Handle a key{press,release}.
 		 * Return true if the key was handled.
 		 */
-		var key_handler = function(code, state){
+		var key_handler = function(code, state, e){
 				/* normalize wasd to arrows */
 				if ( code == 83 ) code = KEY_DOWN;
-				if ( code == 87 ) code = KEY_UP
-;				if ( code == 65 ) code = KEY_LEFT;
+				if ( code == 87 ) code = KEY_UP;
+				if ( code == 65 ) code = KEY_LEFT;
 				if ( code == 68 ) code = KEY_RIGHT;
 
 				switch ( code ){
@@ -903,6 +903,7 @@ var nitroid = new function() {
 				case KEY_SPACE:
 				case KEY_HOLD:
 						key[code] = state;
+						key[KEY_HOLD] = e.altKey;
 						break;
 
 				case KEY_DROP:
@@ -925,13 +926,13 @@ var nitroid = new function() {
 		};
 
 		var keypress = function(e){
-				if ( key_handler(e.keyCode || e.which, true) ){
+				if ( key_handler(e.keyCode || e.which, true, e) ){
 						e.preventDefault();
 				}
 		}
 
 		var keyrelease = function(e){
-				if ( key_handler(e.keyCode || e.which, false) ){
+				if ( key_handler(e.keyCode || e.which, false, e) ){
 						e.preventDefault();
 				}
 		}
