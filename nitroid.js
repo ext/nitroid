@@ -145,6 +145,16 @@ var nitroid = new function() {
 				tile_start: new vector(552, 70),
 				tile_size: new vector(24, 18),
 				frames: 6
+			},
+			space_pirate: {
+				tile_start: new vector(0, 150),
+				tile_size: new vector(58, 66),
+				frames: 8
+			},
+			space_pirate_beam: {
+				tile_start: new vector(470, 160),
+				tile_size: new vector(36,10),
+				frames: 2
 			}
 		};
 		/* animation_data: animation, frame, facing, blink */ //blink: 0 -> 2.0 (0: solid, 1.0: transparent, 2.0: solid)
@@ -155,6 +165,12 @@ var nitroid = new function() {
 				damage: 20.0,
 				speed: 9.0,
 				blast: 20.0
+			},
+			{
+				animation: animations.space_pirate_beam,
+				damage: 20.0,
+				speed: 15.0,
+				blast: 5.0
 			}
 		];
 
@@ -169,6 +185,7 @@ var nitroid = new function() {
 			if(enemy_collision_test(e, new_pos)
 				|| !enemy_collision_test(e, new_pos.minus(new vector(0, -1))) ) {
 				e.direction *= -1;
+				e.animation_data.facing = e.direction;
 			} else {
 				e.position = new_pos;
 			}
@@ -181,6 +198,18 @@ var nitroid = new function() {
 				spawn_cost: 5,
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 20,
+				speed: 2.0,
+				touch_damage: 10.0,
+				run: function(e) { /* e : enemy instance */
+					enemy_walker(e, this.speed);
+				}
+			},
+			{
+				/* space pirate */
+				animation: animations.space_pirate,
+				spawn_cost: 5,
+				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
+				life: 50,
 				speed: 2.0,
 				touch_damage: 10.0,
 				run: function(e) { /* e : enemy instance */
@@ -687,19 +716,23 @@ var nitroid = new function() {
 										possible_spawns.push(e);
 								}
 							}
+							var i = 0;
 							while(spawn_resources > 0 && possible_spawns.length > 0) {
-								var s = Math.floor(frand(y) * possible_spawns.length);
+								var s = Math.floor(frand(y + i) * possible_spawns.length);
 								if(possible_spawns[s].spawn_cost < spawn_resources) {
-									spawn_resources -= possible_spawns[i].spawn_cost;
+									spawn_resources -= possible_spawns[s].spawn_cost;
+									var dir = Math.random() > 0.5 ? 1 : -1;
 									spawn_list.push({
 										/* position:  - set later */
+										direction: dir,
 										type: s,
 										life: possible_spawns[s].life,
-										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: 1, blink: 0.0}
+										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: dir, blink: 0.0}
 									});
 								} else {
 									possible_spawns.splice(s, 1);
 								}
+								++i;
 							}
 						}
 
