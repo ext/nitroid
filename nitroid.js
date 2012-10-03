@@ -152,8 +152,13 @@ var nitroid = new function() {
 				tile_size: new vector(58, 66),
 				frames: 8
 			},
+			space_pirate_look: {
+				tile_start: new vector(464, 150),
+				tile_size: new vector(58, 66),
+				frames: 1
+			},
 			space_pirate_beam: {
-				tile_start: new vector(470, 160),
+				tile_start: new vector(560, 160),
 				tile_size: new vector(36,10),
 				frames: 2
 			}
@@ -190,6 +195,7 @@ var nitroid = new function() {
 				 || !enemy_collision_test(e, new_pos.minus(new vector(0, -1))) ) {
 					 e.direction *= -1;
 					 e.animation_data.facing = e.direction;
+					 e.last_turn = t;
 				 } else {
 					 e.position = new_pos;
 				 }
@@ -241,11 +247,38 @@ var nitroid = new function() {
 				life: 50,
 				speed: 2.0,
 				fire_rate: 3000,
+				turn_time: 0.9,
+				turn_delay: 2000,
 				touch_damage: 10.0,
 				run: function(e) { /* e : enemy instance */
 					enemy_animation(e);
+
+					if(e.turning == undefined) { 
+						e.turning = 0;
+						e.last_turn = 0;
+					}
+
+					if(e.turning > 0) {
+						e.turning -= dt;
+						if(e.turning <= 0) {
+							e.direction *= -1;
+							e.animation_data.facing = e.direction;
+							e.animation_data.animation = animations.space_pirate;
+							e.animation_data.frame = 0;
+						}	
+						return;
+					}
+
 					enemy_walker(e, this.speed);
-					enemy_shooter(e, this.fire_rate);
+
+					if( (t - e.last_turn) > this.turn_delay && Math.random() < 0.01) {
+						e.last_turn = t;
+						//Turn
+						e.animation_data.animation = animations.space_pirate_look;
+						e.turning = this.turn_time;
+					} else {
+						enemy_shooter(e, this.fire_rate);
+					}
 				}
 			}
 		]
