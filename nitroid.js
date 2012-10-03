@@ -162,21 +162,24 @@ var nitroid = new function() {
 
 		var projectile_types = [
 			{
-				animation: animations.missile,
-				damage: 20.0,
-				speed: 9.0,
-				blast: 25.0
-			},
-			{
-				animation: animations.space_pirate_beam,
-				damage: 20.0,
-				speed: 15.0,
-				blast: 5.0
-			}
+			animation: animations.missile,
+			damage: 20.0,
+			speed: 9.0,
+			blast: 25.0
+		},
+		{
+			animation: animations.space_pirate_beam,
+			damage: 20.0,
+			speed: 15.0,
+			blast: 5.0
+		}
 		];
 
-		var enemy_walker = function(e, speed) {
+		var enemy_animation = function(e) {
 			e.animation_data.frame += animation_df;
+		}
+
+		var enemy_walker = function(e, speed) {
 			if(e.direction == undefined) {
 				e.direction = Math.random() < 0.5 ? -1 : 1;
 			}
@@ -184,11 +187,35 @@ var nitroid = new function() {
 			var new_pos = e.position;
 			new_pos.x += movement;
 			if(enemy_collision_test(e, new_pos)
-				|| !enemy_collision_test(e, new_pos.minus(new vector(0, -1))) ) {
-				e.direction *= -1;
-				e.animation_data.facing = e.direction;
-			} else {
-				e.position = new_pos;
+				 || !enemy_collision_test(e, new_pos.minus(new vector(0, -1))) ) {
+					 e.direction *= -1;
+					 e.animation_data.facing = e.direction;
+				 } else {
+					 e.position = new_pos;
+				 }
+		}
+
+		var enemy_shooter = function(e, fire_rate) {
+			if ( e.last_fire != undefined && (t-e.last_fire) < fire_rate ) return;
+			e.last_fire = t;
+			var player_direction = new vector(pos, depth).minus(e.position).normalize();
+			var player_direction_x = player_direction.x > 0 ? 1 : -1;
+			if(player_direction_x == e.direction && Math.abs(player_direction.y) < 0.85 /* maximum fire angle */
+				 && depth <= e.position.y && depth > (e.position.y - platform_height)) {
+				var size = enemy_types[e.type].animation.tile_size;
+				var p = {
+					type: 1, /* beam */
+					pos: e.position.minus(new vector(0, size.y * 0.5 / tile_height)),
+					rotation: Math.atan2(player_direction.y, player_direction.x),
+					velocity: player_direction.normalize(),
+					frame: 0,
+					hostile: true,
+					explode: 0 
+				};
+				p.pos = p.pos.add(p.velocity.multiply(size.x * 0.5 / tile_width));
+				p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
+			
+				fire_projectile(p);
 			}
 		}
 
@@ -202,6 +229,7 @@ var nitroid = new function() {
 				speed: 2.0,
 				touch_damage: 10.0,
 				run: function(e) { /* e : enemy instance */
+					enemy_animation(e);
 					enemy_walker(e, this.speed);
 				}
 			},
@@ -212,9 +240,12 @@ var nitroid = new function() {
 				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 50,
 				speed: 2.0,
+				fire_rate: 3000,
 				touch_damage: 10.0,
 				run: function(e) { /* e : enemy instance */
+					enemy_animation(e);
 					enemy_walker(e, this.speed);
+					enemy_shooter(e, this.fire_rate);
 				}
 			}
 		]
@@ -517,6 +548,21 @@ var nitroid = new function() {
 				});
 		}
 
+		var fire_projectile = function(p) {
+			projectiles.push(p);
+
+			var size = projectile_types[p.type].animation.tile_size;
+
+			var hit = projectile_entity_collision_test(p)
+			|| collision_test(p.pos.x, p.pos.y, 
+												size.x / tile_width,
+												size.y / tile_height);
+			if(hit) {
+				explode_projectile(projectiles.length - 1);
+			}
+		}
+
+
 		var player_fire_projectile = function() {
 			if ( (t-last_fire) < player_rof ) return;
 			last_fire = t;
@@ -554,15 +600,7 @@ var nitroid = new function() {
 			p.pos = p.pos.add(p.velocity.multiply(projectile_spawn_offset));
 			p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
 
-			projectiles.push(p);
-
-			var hit = projectile_entity_collision_test(p)
-			|| collision_test(p.pos.x, p.pos.y, 
-												animations.missile.tile_size.x / tile_width,
-												animations.missile.tile_size.y / tile_height);
-			if(hit) {
-				explode_projectile(projectiles.length - 1);
-			}
+			fire_projectile(p);
 		}
 
 		var update_bombs = function(){
@@ -854,6 +892,9 @@ var nitroid = new function() {
 				context.translate(position.x, position.y);
 				render_animation(e.animation_data);
 				context.restore();
+/*
+				context.fillStyle = '#f0f';
+				context.fillRect(e.position.x * tile_width, (e.position.y - depth + y_screencenter) * tile_height, 5, 5);*/
 
 			}
 		}
