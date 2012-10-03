@@ -707,7 +707,7 @@ var nitroid = new function() {
 		 * Recalculates the map cache if necessary.
 		 */
 		var update_map = function(){
-				var d = Math.floor(depth) - y_screencenter;
+				var d = Math.floor(depth) - y_screencenter + 2;
 
 				if(d + vertical_tiles < map_end) return;
 
