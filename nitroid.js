@@ -537,7 +537,7 @@ var nitroid = new function() {
 		}
 
 		var update_bombs = function(){
-				for ( i in bombs ){
+				for ( var i in bombs ){
 						bombs[i].lifespan -= dt;
 						if ( bombs[i].lifespan < 0.0 ){
 								var sx = Math.ceil(bomb_blast.x / horizontal_tiles);
@@ -616,7 +616,7 @@ var nitroid = new function() {
 
 		var update_enemies = function() {
 			var despawn_depth = depth - y_screencenter - enemies_despawn_distance;
-			for(i in enemies) {
+			for(var i in enemies) {
 				if(enemies[i].life <= 0 || enemies[i].position.y <= despawn_depth) {
 					console.log("Remove enemy at depth " + enemies[i].position.y);
 					enemies.splice(i, 1);
@@ -690,7 +690,7 @@ var nitroid = new function() {
 						if( is_row(y) ) {
 							var spawn_resources = y * depth_spawn_resource_factor;
 							var possible_spawns = [];
-							for( i in enemy_types) {
+							for( var i in enemy_types) {
 								var e = enemy_types[i];
 								if(e.spawn_cost < spawn_resources && 
 									e.spawn_depth[0] <= depth && 
@@ -720,7 +720,7 @@ var nitroid = new function() {
 						if( spawn_list.length > 0 ) {
 							var spawn_distance = depth_width(y - 1) / spawn_list.length;
 							var x = wall_width(y - 1, 0);
-							for( i in spawn_list ) {
+							for( var i in spawn_list ) {
 								var e = spawn_list[i];
 								if(row[x] != TILE_EMPTY) {
 									e.position = new vector(x + 0.5 + frand(y * 4711.0), y);
@@ -814,7 +814,7 @@ var nitroid = new function() {
 		}
 
 		var render_enemies = function() {
-			for(i in enemies) {
+			for(var i in enemies) {
 				var e = enemies[i];
 				var position = new vector(e.position.x * tile_width, ( e.position.y - depth + y_screencenter) * tile_height - e.animation_data.animation.tile_size.y * 0.5);
 				context.save();
@@ -826,7 +826,7 @@ var nitroid = new function() {
 		}
 
 		var render_bombs = function(){
-				for ( i in bombs ){
+				for ( var i in bombs ){
 						var size = new vector(10,10);
 						var phase = 0;
 						if ( bombs[i].lifespan < 0.3 ){
@@ -840,7 +840,7 @@ var nitroid = new function() {
 		}
 
 		var render_projectiles = function() {
-			for ( i in projectiles) {
+			for ( var i in projectiles) {
 
 				context.save();
 				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + y_screencenter)  * tile_height);
