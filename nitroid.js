@@ -483,8 +483,7 @@ var nitroid = new function() {
 				if ( !touching_floor || bombs.length >= 3 ) return;
 
 				bombs.push({
-						x: pos,
-						y: depth,
+						pos: new vector(pos, depth),
 						lifespan: bomb_lifespan,
 				});
 		}
@@ -538,17 +537,20 @@ var nitroid = new function() {
 		}
 
 		var update_bombs = function(){
-				for ( i in bombs ){						
+				for ( i in bombs ){
 						bombs[i].lifespan -= dt;
 						if ( bombs[i].lifespan < 0.0 ){
-								sx = Math.ceil(bomb_blast / horizontal_tiles);
-								sy = Math.ceil(bomb_blast / vertical_tiles);
+								var sx = Math.ceil(bomb_blast / horizontal_tiles);
+								var sy = Math.ceil(bomb_blast / vertical_tiles);
+								var b = bombs[i];
+
 								for ( var y = -sy; y < sy; y++ ){
-										var py = Math.round(bombs[i].y) + y;
+										var py = Math.round(b.pos.y) + y;
 										for ( var x = -sx; x < sx; x++ ){
-												var px = Math.round(bombs[i].x) + x;
-												if ( px < 0 || py < 0 ) continue;
+												var px = Math.round(b.pos.x) + x;
 												var tile = map[py][px];
+
+												if ( px < 0 || py < 0 ) continue;
 												if ( tile == -1 ) continue;
 												if ( tile >= 8 && tile < 16 ){
 														map[py][px] = -1;
@@ -824,7 +826,7 @@ var nitroid = new function() {
 						}
 
 						context.fillStyle = 'rgb(255,'+phase+',0)';
-						context.fillRect(bombs[i].x * tile_height - size*0.5, (bombs[i].y - depth + y_screencenter) * tile_width - size*0.5, size, size);
+						context.fillRect(bombs[i].pos.x * tile_height - size*0.5, (bombs[i].pos.y - depth + y_screencenter) * tile_width - size*0.5, size, size);
 				}
 		}
 
