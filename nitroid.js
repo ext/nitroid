@@ -358,7 +358,7 @@ var nitroid = new function() {
 		}
 
 		var player_enemy_collision_test = function(e) {
-			return aabb_aabb(player_pos(), player_size(), enemies[i].position, enemy_types[e.type].animation.tile_size);
+			return aabb_aabb(player_pos(), player_size(), e.position, enemy_types[e.type].animation.tile_size);
 		}
 
 		/**
