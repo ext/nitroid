@@ -157,6 +157,11 @@ var nitroid = new function() {
 				tile_size: new vector(58, 66),
 				frames: 1
 			},
+			space_pirate_claw: {
+				tile_start: new vector(562, 170),
+				tile_size: new vector(27,27),
+				frames: 6
+			},
 			space_pirate_beam: {
 				tile_start: new vector(560, 160),
 				tile_size: new vector(36,10),
@@ -171,6 +176,12 @@ var nitroid = new function() {
 			damage: 20.0,
 			speed: 9.0,
 			blast: 25.0
+		},
+		{
+			animation: animations.space_pirate_claw,
+			damage: 15.0,
+			speed: 8.0,
+			blast: 5.0
 		},
 		{
 			animation: animations.space_pirate_beam,
