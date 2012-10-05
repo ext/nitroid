@@ -337,7 +337,7 @@ var nitroid = new function() {
 			{
 				/* space pirate */
 				animation: animations.space_pirate1,
-				spawn_cost: 5,
+				spawn_cost: 50,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 50,
 				speed: 2.0,
