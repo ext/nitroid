@@ -270,7 +270,7 @@ var nitroid = new function() {
 			var player_direction = new vector(pos, depth).minus(e.position).normalize();
 			var player_direction_x = player_direction.x > 0 ? 1 : -1;
 			if(player_direction_x == e.direction && Math.abs(player_direction.y) < 0.85 /* maximum fire angle */
-				 && depth <= e.position.y && depth > (e.position.y - platform_height)) {
+				 && depth <= e.position.y && depth > (e.position.y - platform_height * 1.5)) {
 				var size = enemy_types[e.type].animation.tile_size;
 				var p = {
 					type: enemy_types[e.type].projectile_type,
@@ -337,7 +337,7 @@ var nitroid = new function() {
 			{
 				/* space pirate */
 				animation: animations.space_pirate1,
-				spawn_cost: 50,
+				spawn_cost: 5,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 50,
 				speed: 2.0,
