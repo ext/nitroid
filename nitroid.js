@@ -523,7 +523,7 @@ var nitroid = new function() {
 		}
 
 		var player_size = function() {
-			return new vector(player_width, player_height);
+			return player_animation.animation.tile_size;
 		}
 
 		var damage_player = function(dmg) {
