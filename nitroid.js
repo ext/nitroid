@@ -147,23 +147,63 @@ var nitroid = new function() {
 				tile_size: new vector(24, 18),
 				frames: 6
 			},
-			space_pirate: {
+			space_pirate1: {
 				tile_start: new vector(0, 150),
 				tile_size: new vector(58, 66),
 				frames: 8
 			},
-			space_pirate_look: {
+			space_pirate1_look: {
 				tile_start: new vector(464, 150),
 				tile_size: new vector(58, 66),
 				frames: 1
 			},
-			space_pirate_claw: {
+			space_pirate2: {
+				tile_start: new vector(0, 150 + 66 ),
+				tile_size: new vector(58, 66),
+				frames: 8
+			},
+			space_pirate2_look: {
+				tile_start: new vector(464, 150 + 66 ),
+				tile_size: new vector(58, 66),
+				frames: 1
+			},
+			space_pirate3: {
+				tile_start: new vector(0, 150 + 66 * 2 ),
+				tile_size: new vector(58, 66),
+				frames: 8
+			},
+			space_pirate3_look: {
+				tile_start: new vector(464, 150 + 66 * 2 ),
+				tile_size: new vector(58, 66),
+				frames: 1
+			},
+			space_pirate4: {
+				tile_start: new vector(0, 150 + 66 * 3 ),
+				tile_size: new vector(58, 66),
+				frames: 8
+			},
+			space_pirate4_look: {
+				tile_start: new vector(464, 150 + 66 * 3 ),
+				tile_size: new vector(58, 66),
+				frames: 1
+			},
+			space_pirate_claw1: {
 				tile_start: new vector(562, 170),
 				tile_size: new vector(27,27),
 				frames: 6
 			},
-			space_pirate_beam: {
+			space_pirate_claw2: {
+				tile_start: new vector(562, 170 + 27),
+				tile_size: new vector(27,27),
+				frames: 6
+			},
+			space_pirate_beam1: {
 				tile_start: new vector(560, 160),
+				tile_size: new vector(36,10),
+				frames: 2
+			},
+			space_pirate_beam2: {
+				tile_start: new vector(560 + 36, 160),
 				tile_size: new vector(36,10),
 				frames: 2
 			}
@@ -178,15 +218,27 @@ var nitroid = new function() {
 			blast: 25.0
 		},
 		{
-			animation: animations.space_pirate_claw,
+			animation: animations.space_pirate_claw1,
 			damage: 15.0,
 			speed: 8.0,
 			blast: 5.0
 		},
 		{
-			animation: animations.space_pirate_beam,
+			animation: animations.space_pirate_claw2,
+			damage: 20.0,
+			speed: 10.0,
+			blast: 5.0
+		},
+		{
+			animation: animations.space_pirate_beam1,
 			damage: 20.0,
 			speed: 15.0,
+			blast: 5.0
+		},
+		{
+			animation: animations.space_pirate_beam2,
+			damage: 25.0,
+			speed: 20.0,
 			blast: 5.0
 		}
 		];
@@ -221,7 +273,7 @@ var nitroid = new function() {
 				 && depth <= e.position.y && depth > (e.position.y - platform_height)) {
 				var size = enemy_types[e.type].animation.tile_size;
 				var p = {
-					type: 1, /* beam */
+					type: enemy_types[e.type].projectile_type,
 					pos: e.position.minus(new vector(0, size.y * 0.5 / tile_height)),
 					rotation: Math.atan2(player_direction.y, player_direction.x),
 					velocity: player_direction.normalize(),
@@ -236,12 +288,44 @@ var nitroid = new function() {
 			}
 		}
 
+		var space_pirate_run = function(e) { /* e : enemy instance */
+			enemy_animation(e);
+
+			if(e.turning == undefined) { 
+				e.turning = 0;
+				e.last_turn = 0;
+			}
+
+			if(e.turning > 0) {
+				e.turning -= dt;
+				if(e.turning <= 0) {
+					e.direction *= -1;
+					e.animation_data.facing = e.direction;
+					e.animation_data.animation = enemy_types[e.type].animations[0];
+					e.animation_data.frame = 0;
+				}	
+				return;
+			}
+
+			enemy_walker(e, this.speed);
+
+			if( (t - e.last_turn) > this.turn_delay && Math.random() < 0.15 * dt) {
+				e.last_turn = t;
+				//Turn
+				e.animation_data.animation = enemy_types[e.type].animations[1];
+				e.turning = this.turn_time;
+			} else {
+				enemy_shooter(e, this.fire_rate);
+			}
+		}
+
+
 		var enemy_types = [
 			{
 				/* walker */
 				animation: animations.enemy_walker1,
 				spawn_cost: 5,
-				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
+				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 20,
 				speed: 2.0,
 				touch_damage: 10.0,
@@ -252,46 +336,64 @@ var nitroid = new function() {
 			},
 			{
 				/* space pirate */
-				animation: animations.space_pirate,
-				spawn_cost: 5,
-				spawn_depth: [0.0, 100.0], /* depth range this enemy occur in, set max to -1 to never limit */
+				animation: animations.space_pirate1,
+				spawn_cost: 50,
+				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 50,
 				speed: 2.0,
 				fire_rate: 3000,
 				turn_time: 0.9,
 				turn_delay: 2000,
 				touch_damage: 10.0,
-				run: function(e) { /* e : enemy instance */
-					enemy_animation(e);
-
-					if(e.turning == undefined) { 
-						e.turning = 0;
-						e.last_turn = 0;
-					}
-
-					if(e.turning > 0) {
-						e.turning -= dt;
-						if(e.turning <= 0) {
-							e.direction *= -1;
-							e.animation_data.facing = e.direction;
-							e.animation_data.animation = animations.space_pirate;
-							e.animation_data.frame = 0;
-						}	
-						return;
-					}
-
-					enemy_walker(e, this.speed);
-
-					if( (t - e.last_turn) > this.turn_delay && Math.random() < 0.01) {
-						e.last_turn = t;
-						//Turn
-						e.animation_data.animation = animations.space_pirate_look;
-						e.turning = this.turn_time;
-					} else {
-						enemy_shooter(e, this.fire_rate);
-					}
-				}
-			}
+				projectile_type: 1,
+				animations: [animations.space_pirate1, animations.space_pirate1_look],
+				run: space_pirate_run
+			}	,
+			{
+				/* space pirate */
+				animation: animations.space_pirate2,
+				spawn_cost: 100,
+				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
+				life: 100,
+				speed: 2.0,
+				fire_rate: 2500,
+				turn_time: 0.9,
+				turn_delay: 2000,
+				touch_damage: 15.0,
+				projectile_type: 2,
+				animations: [animations.space_pirate2, animations.space_pirate2_look],
+				run: space_pirate_run
+			}	,
+			{
+				/* space pirate */
+				animation: animations.space_pirate4,
+				spawn_cost: 200,
+				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
+				life: 100,
+				speed: 4.0,
+				fire_rate: 2000,
+				turn_time: 0.9,
+				turn_delay: 2000,
+				touch_damage: 30.0,
+				projectile_type: 3,
+				animations: [animations.space_pirate4, animations.space_pirate4_look],
+				run: space_pirate_run
+			}	,
+			{
+				/* space pirate */
+				animation: animations.space_pirate3,
+				spawn_cost: 500,
+				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
+				life: 200,
+				speed: 2.0,
+				fire_rate: 1500,
+				turn_time: 0.9,
+				turn_delay: 2000,
+				touch_damage: 10.0,
+				projectile_type: 4,
+				animations: [animations.space_pirate3, animations.space_pirate3_look],
+				run: space_pirate_run
+			}	
 		]
 
 		var enemies = []; /* position, type, life, animation_data */
