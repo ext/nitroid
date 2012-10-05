@@ -254,14 +254,13 @@ var nitroid = new function() {
 
 			{
 					var size = enemy_types[e.type].animation.tile_size;
-
 					var movement = e.direction * speed * dt;
 					var new_pos = new vector(e.position.x + movement, e.position.y);
 					var p = new_pos.x;
 					if ( e.direction > 0 ){
-							p += size.x / tile_width
+							p += size.x / tile_width / 2
 					} else {
-							p -= size.x / tile_width
+							p -= size.x / tile_width / 2
 					}
 					var px = Math.floor(p);
 					var py = Math.floor(new_pos.y);
