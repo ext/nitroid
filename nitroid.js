@@ -344,7 +344,7 @@ var nitroid = new function() {
 				fire_rate: 3000,
 				turn_time: 0.9,
 				turn_delay: 2000,
-				touch_damage: 10.0,
+				touch_damage: 20.0,
 				projectile_type: 1,
 				animations: [animations.space_pirate1, animations.space_pirate1_look],
 				run: space_pirate_run
@@ -359,7 +359,7 @@ var nitroid = new function() {
 				fire_rate: 2500,
 				turn_time: 0.9,
 				turn_delay: 2000,
-				touch_damage: 15.0,
+				touch_damage: 25.0,
 				projectile_type: 2,
 				animations: [animations.space_pirate2, animations.space_pirate2_look],
 				run: space_pirate_run
@@ -370,7 +370,7 @@ var nitroid = new function() {
 				spawn_cost: 200,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 100,
-				speed: 4.0,
+				speed: 2.5,
 				fire_rate: 2000,
 				turn_time: 0.9,
 				turn_delay: 2000,
@@ -382,14 +382,14 @@ var nitroid = new function() {
 			{
 				/* space pirate */
 				animation: animations.space_pirate3,
-				spawn_cost: 500,
+				spawn_cost: 400,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 200,
 				speed: 2.0,
 				fire_rate: 1500,
 				turn_time: 0.9,
 				turn_delay: 2000,
-				touch_damage: 10.0,
+				touch_damage: 40.0,
 				projectile_type: 4,
 				animations: [animations.space_pirate3, animations.space_pirate3_look],
 				run: space_pirate_run
