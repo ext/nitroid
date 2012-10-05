@@ -948,8 +948,8 @@ var nitroid = new function() {
 								row[x] = tile_at(x, y);
 						}
 						if( spawn_list.length > 0 ) {
-							var spawn_distance = Math.min(depth_width(y - 1)-1, depth_width(y - 2)-1) / spawn_list.length;
-							var x = Math.max(wall_width(y - 1, 0), wall_width(y - 2, 0));
+							var spawn_distance = (Math.min(depth_width(y - 1), depth_width(y - 2), depth_width(y - 3))-2) / spawn_list.length;
+							var x = Math.max(wall_width(y - 1, 0), wall_width(y - 2, 0), wall_width(y - 3, 0));
 							for( var i in spawn_list ) {
 								var e = spawn_list[i];
 								/* testing both floor/ceil so it wont stand on the edge */
