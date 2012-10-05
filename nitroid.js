@@ -954,7 +954,9 @@ var nitroid = new function() {
 								var e = spawn_list[i];
 								/* testing both floor/ceil so it wont stand on the edge */
 								if( row[Math.floor(x)] != TILE_EMPTY && row[Math.ceil(x)] != TILE_EMPTY ) {
-									e.position = new vector(x + 0.5 + frand(y * 4711.0), y);
+									var size = enemy_types[e.type].animation.tile_size;
+									var bias = 0.1;
+									e.position = new vector(x + size.x / tile_width + bias, y);
 									enemies.push(e);
 								}
 								x += spawn_distance;
