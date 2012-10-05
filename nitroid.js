@@ -574,7 +574,7 @@ var nitroid = new function() {
 		var enemy_collision_test = function(enemy, position) {
 			var size = enemy_types[enemy.type].animation.tile_size;
 			return collision_test(
-				position.x /*- size.x/( 2.0 * tile_width)*/, position.y - 0.5,
+				position.x - size.x / 2 / tile_width, position.y - 0.001,
 				size.x/tile_width, -size.y/tile_height
 			);
 		}
