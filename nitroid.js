@@ -203,7 +203,7 @@ var nitroid = new function() {
 				frames: 2
 			},
 			space_pirate_beam2: {
-				tile_start: new vector(560 + 36, 160),
+				tile_start: new vector(560 + 36 * 2, 160),
 				tile_size: new vector(36,10),
 				frames: 2
 			}
@@ -319,6 +319,7 @@ var nitroid = new function() {
 			}
 		}
 
+		var enemy_base_value = 5.0;
 
 		var enemy_types = [
 			{
@@ -352,7 +353,7 @@ var nitroid = new function() {
 			{
 				/* space pirate */
 				animation: animations.space_pirate2,
-				spawn_cost: 100,
+				spawn_cost: 180,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 100,
 				speed: 2.0,
@@ -367,9 +368,9 @@ var nitroid = new function() {
 			{
 				/* space pirate */
 				animation: animations.space_pirate4,
-				spawn_cost: 200,
+				spawn_cost: 280,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
-				life: 100,
+				life: 150,
 				speed: 2.5,
 				fire_rate: 2000,
 				turn_time: 0.9,
@@ -382,7 +383,7 @@ var nitroid = new function() {
 			{
 				/* space pirate */
 				animation: animations.space_pirate3,
-				spawn_cost: 400,
+				spawn_cost: 500,
 				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 200,
 				speed: 2.0,
@@ -905,10 +906,11 @@ var nitroid = new function() {
 							var possible_spawns = [];
 							for( var i in enemy_types) {
 								var e = enemy_types[i];
+								e.index = i;
 								if(e.spawn_cost < spawn_resources && 
 									e.spawn_depth[0] <= depth && 
 									( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth)) {
-										possible_spawns.push(e);
+										for(var c = 0; c < e.spawn_cost / enemy_base_value; ++c) possible_spawns.push(e);
 								}
 							}
 							var i = 0;
@@ -920,7 +922,7 @@ var nitroid = new function() {
 									spawn_list.push({
 										/* position:  - set later */
 										direction: dir,
-										type: s,
+										type: possible_spawns[s].index,
 										life: possible_spawns[s].life,
 										animation_data: {animation: possible_spawns[s].animation, frame: 0, facing: dir, blink: 0.0}
 									});
