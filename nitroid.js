@@ -251,17 +251,29 @@ var nitroid = new function() {
 			if(e.direction == undefined) {
 				e.direction = Math.random() < 0.5 ? -1 : 1;
 			}
-			var movement = e.direction * speed * dt;
-			var new_pos = e.position;
-			new_pos.x += movement;
-			if(enemy_collision_test(e, new_pos)
-				 || !enemy_collision_test(e, new_pos.minus(new vector(0, -1))) ) {
+
+			{
+					var size = enemy_types[e.type].animation.tile_size;
+
+					var movement = e.direction * speed * dt;
+					var new_pos = new vector(e.position.x + movement, e.position.y);
+					var p = new_pos.x;
+					if ( e.direction > 0 ){
+							p += size.x / tile_width
+					} else {
+							p -= size.x / tile_width
+					}
+					var px = Math.floor(p);
+					var py = Math.floor(new_pos.y);
+					var tile = map[py][px];
+					if ( !(tile == -1 || enemy_collision_test(e, new_pos)) ){
+							e.position.x = new_pos.x;
+					} else {
 					 e.direction *= -1;
 					 e.animation_data.facing = e.direction;
 					 e.last_turn = t;
-				 } else {
-					 e.position = new_pos;
-				 }
+					}
+			}
 		}
 
 		var enemy_shooter = function(e, fire_rate) {
