@@ -357,11 +357,11 @@ var nitroid = new function() {
 					velocity: player_direction.normalize(),
 					frame: 0,
 					hostile: true,
-					explode: 0 
+					explode: 0
 				};
 				p.pos = p.pos.add(p.velocity.multiply(size.x * 0.5 / tile_width));
 				p.velocity = p.velocity.multiply(projectile_types[p.type].speed);
-			
+
 				fire_projectile(p);
 			}
 		}
@@ -369,7 +369,7 @@ var nitroid = new function() {
 		var space_pirate_run = function(e) { /* e : enemy instance */
 			enemy_animation(e);
 
-			if(e.turning == undefined) { 
+			if(e.turning == undefined) {
 				e.turning = 0;
 				e.last_turn = 0;
 			}
@@ -381,7 +381,7 @@ var nitroid = new function() {
 					e.animation_data.facing = e.direction;
 					e.animation_data.animation = enemy_types[e.type].animations[0];
 					e.animation_data.frame = 0;
-				}	
+				}
 				return;
 			}
 
@@ -485,7 +485,7 @@ var nitroid = new function() {
 				projectile_type: 4,
 				animations: [animations.space_pirate3, animations.space_pirate3_look],
 				run: space_pirate_run
-			}	
+			}
 		]
 
 		var enemies = []; /* position, type, life, animation_data */
@@ -738,7 +738,7 @@ var nitroid = new function() {
 				if ( !(key[KEY_LEFT] || key[KEY_RIGHT]) ) return;
 
 				var new_pos = pos;
-				if ( key[KEY_LEFT]  ) { 
+				if ( key[KEY_LEFT]  ) {
 					new_pos -= player_speed * dt;
 					player_horizontal_direction = -1;
 					player_animation.facing = -1;
@@ -810,7 +810,7 @@ var nitroid = new function() {
 			var size = projectile_types[p.type].animation.tile_size;
 
 			var hit = projectile_entity_collision_test(p)
-			|| collision_test(p.pos.x, p.pos.y, 
+			|| collision_test(p.pos.x, p.pos.y,
 												size.x / tile_width,
 												size.y / tile_height);
 			if(hit) {
@@ -849,7 +849,7 @@ var nitroid = new function() {
 				p.velocity = new vector(1, 1);
 			} else if(key[KEY_DOWN]) {
 				p.rotation = Math.PI / 2.0;
-				p.velocity = new vector(0, 1); 
+				p.velocity = new vector(0, 1);
 			}
 			p.velocity = p.velocity.normalize();
 
@@ -887,7 +887,7 @@ var nitroid = new function() {
 								for ( var j in enemies) {
 										var e = enemies[j];
 										var size = enemy_types[e.type].animation.tile_size;
-										
+
 										if ( aabb_aabb(b.pos, bomb_blast, e.position, size) ){
 												enemies[j].life -= bomb_dmg;
 										}
@@ -935,8 +935,8 @@ var nitroid = new function() {
 				} else {
 					p.frame += animation_df;
 					p.pos = p.pos.add(p.velocity.multiply(dt));
-					var hit = projectile_entity_collision_test(p) 
-					|| collision_test(p.pos.x, p.pos.y, 
+					var hit = projectile_entity_collision_test(p)
+					|| collision_test(p.pos.x, p.pos.y,
 														animations.missile.tile_size.x / tile_width,
 														animations.missile.tile_size.y / tile_height);
 					if(hit) {
@@ -1020,7 +1020,7 @@ var nitroid = new function() {
 				var despawn_depth = depth - y_screencenter - enemies_despawn_distance;
 				for ( var i in items ){
 						var cur = items[i];
-						
+
 						if ( cur.position.y <= despawn_depth ){
 								console.log("Remove item at depth " + enemies[i].position.y);
 								items.splice(i, 1);
@@ -1072,8 +1072,8 @@ var nitroid = new function() {
 							for( var i in enemy_types) {
 								var e = enemy_types[i];
 								e.index = i;
-								if(e.spawn_cost < spawn_resources && 
-									e.spawn_depth[0] <= depth && 
+								if(e.spawn_cost < spawn_resources &&
+									e.spawn_depth[0] <= depth &&
 									( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth)) {
 										for(var c = 0; c < e.spawn_cost / enemy_base_value; ++c) possible_spawns.push(e);
 								}
@@ -1381,7 +1381,7 @@ var nitroid = new function() {
 
 				do {
 						t += frame_delay;
-						
+
 						update();
 						render();
 
