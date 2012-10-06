@@ -790,6 +790,7 @@ var nitroid = new function() {
 								var sy = Math.ceil(bomb_blast.y / vertical_tiles);
 								var b = bombs[i];
 
+								/* destroy tiles */
 								for ( var y = -sy; y < sy; y++ ){
 										var py = Math.round(b.pos.y) + y;
 										for ( var x = -sx; x < sx; x++ ){
@@ -804,6 +805,7 @@ var nitroid = new function() {
 										}
 								}
 
+								/* hurt enemies */
 								for ( var j in enemies) {
 										var e = enemies[j];
 										var size = enemy_types[e.type].animation.tile_size;
@@ -811,6 +813,11 @@ var nitroid = new function() {
 										if ( aabb_aabb(b.pos, bomb_blast, e.position, size) ){
 												enemies[j].life -= bomb_dmg;
 										}
+								}
+
+								/* hurt player */
+								if ( aabb_aabb(b.pos, bomb_blast, player_pos(), player_size()) ){
+										player_life -= 20;
 								}
 
 								bombs.splice(i, 1);
