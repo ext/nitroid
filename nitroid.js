@@ -13,7 +13,7 @@ var nitroid = new function() {
 		var player_jump_threshold = 0.25;        /* at what point the jump is floating in air */
 		var player_speed = 5.0;                  /* how fast the player moves horizontally */
 		var bomb_lifespan = 3.0;                 /* how long before a bomb explodes */
-		var bomb_blast = new vector(55,55);
+		var bomb_blast = new vector(85,85);
 		var bomb_dmg = 250;                      /* bomb damage */
 		var depth_spawn_resource_factor = 1.25;  /* Number to multiply depth with to get spawn resources */
 		var hiscore_url = null;
@@ -1232,15 +1232,21 @@ var nitroid = new function() {
 
 		var render_bombs = function(){
 				for ( var i in bombs ){
-						var size = new vector(10,10);
-						var phase = 0;
-						if ( bombs[i].lifespan < 0.3 ){
-								size = bomb_blast;
-								phase = Math.floor(Math.sin(bombs[i].lifespan * 35) * 127 + 127);
-						}
+						var cur = bombs[i];
 
-						context.fillStyle = 'rgb(255,'+phase+',0)';
-						context.fillRect(bombs[i].pos.x * tile_height - size.x*0.5, (bombs[i].pos.y - depth + y_screencenter) * tile_width - size.y*0.5, size.x, size.y);
+						var size = new vector(10,10);
+						if ( bombs[i].lifespan < 0.3 ){
+								context.save();
+								context.translate(cur.pos.x * tile_width, (cur.pos.y  - depth + y_screencenter) * tile_height);
+								var s = 1.0 - bombs[i].lifespan / 0.3;
+								var frame = Math.floor(s * animations.explosion.frames);
+								context.scale(bomb_blast.x / animations.explosion.tile_size.x, bomb_blast.y / animations.explosion.tile_size.y);
+								render_animation({ animation: animations.explosion, frame: frame, facing: 1, blink: 0.0});
+								context.restore();
+						} else {
+								context.fillStyle = 'rgb(255,0,0)';
+								context.fillRect(bombs[i].pos.x * tile_height - size.x*0.5, (bombs[i].pos.y - depth + y_screencenter) * tile_width - size.y*0.5, size.x, size.y);
+						}
 				}
 		}
 
