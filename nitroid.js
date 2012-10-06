@@ -161,8 +161,13 @@ var nitroid = new function() {
 			 * Items
 			 */
 			healthpack: {
-				tile_start: new vector(538, 226),
-				tile_size: new vector(16, 16),
+				tile_start: new vector(559, 226),
+				tile_size: new vector(17, 30),
+				frames: 2
+			},
+			healthpack_empty: {
+				tile_start: new vector(593, 226),
+				tile_size: new vector(17, 30),
 				frames: 1
 			},
 
@@ -278,7 +283,8 @@ var nitroid = new function() {
 
 		var item_type = {
 			healthpack: {
-				animation: animations.healthpack,
+				anim_normal: animations.healthpack,
+				anim_grabbed: animations.healthpack_empty,
 				callback: function(){
 					player_life = player_max_life;
 				}
@@ -994,17 +1000,28 @@ var nitroid = new function() {
 				player_animation.blink -= blink_dt;
 				if(player_animation.blink < 0) player_animation.blink = 0.0;
 			}
+		}
 
-			/* grab items */
-			for ( var i in items ){
-				var cur = items[i];
-				var size = cur.type.animation.tile_size;
-				var pos = cur.position.minus(new vector(0, size.y / tile_height / 2));
-				if ( aabb_aabb(player_pos(), player_size(), pos, size) ){
-					cur.type.callback()
-					items.splice(i, 1);
+		var update_items = function(){
+				var despawn_depth = depth - y_screencenter - enemies_despawn_distance;
+				for ( var i in items ){
+						var cur = items[i];
+						
+						if ( cur.position.y <= despawn_depth ){
+								console.log("Remove item at depth " + enemies[i].position.y);
+								items.splice(i, 1);
+								continue;
+						}
+
+						cur.animation_data.frame += animation_df * 0.7;
+						var size = cur.animation_data.animation.tile_size;
+						var pos = cur.position.minus(new vector(0, size.y / tile_height / 2));
+						if ( !cur.grabbed && aabb_aabb(player_pos(), player_size(), pos, size) ){
+								cur.type.callback();
+								cur.grabbed = true;
+								cur.animation_data.animation = cur.type.anim_grabbed;
+						}
 				}
-			}
 		}
 
 		var update = function(){
@@ -1014,6 +1031,7 @@ var nitroid = new function() {
 				update_player();
 				update_player_movement();
 				update_player_gravity();
+				update_items();
 				update_camera();
 				update_bombs();
 				update_map();
@@ -1072,7 +1090,8 @@ var nitroid = new function() {
 								var x = wall_width(y - 1, 0) + 1;
 								items.push({
 									position: new vector(x + dx * frand(y * 53.7 + 9943), y-0.5),
-									animation_data: { animation: item_type.healthpack.animation, frame: 0, facing: -1, blink: 0.0 },
+									animation_data: { animation: item_type.healthpack.anim_normal, frame: 0, facing: 1, blink: 0.0 },
+									grabbed: false,
 									type: item_type.healthpack,
 								});
 							}
@@ -1173,7 +1192,6 @@ var nitroid = new function() {
 		var render_items = function() {
 			for ( var i in items) {
 				var cur = items[i];
-
 				context.save();
 				context.translate(cur.position.x * tile_width, (cur.position.y  - depth + y_screencenter)  * tile_height);
 				render_animation(cur.animation_data);
