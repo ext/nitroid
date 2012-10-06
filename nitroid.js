@@ -67,12 +67,22 @@ var nitroid = new function() {
 		var player_horizontal_direction = 1; /* -1 or 1 (left or right)  */
 
 		/* fps control */
-		var fps = 30;
-		var frame_delay = 1000 / fps;
-		var dt = 1.0 / fps;
-		var animation_fps = 10;
-		var animation_df = dt * animation_fps;
-		var blink_dt = 0.1;
+		var default_framerate = 30;
+		var fps;
+		var dt;
+		var frame_delay;
+		var animation_fps;
+		var animation_df;
+		var blink_dt;
+
+		var set_framerate = function(v){
+				fps = v;
+				frame_delay = 1000 / fps;
+				dt = 1.0 / fps;
+				animation_fps = 10;
+				animation_df = dt * animation_fps;
+				blink_dt = 0.1;
+		}
 
 		/* constants */
 		var TILE_EMPTY = -1;
@@ -1353,6 +1363,7 @@ var nitroid = new function() {
 						if ( 'hiscore_user' in params ) hiscore_user = params['hiscore_user'];
 
 						/* start game */
+						set_framerate(default_framerate);
 						setInterval(expire, frame_delay);
 						update_map();
 				},
