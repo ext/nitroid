@@ -1201,20 +1201,17 @@ var nitroid = new function() {
 				return Math.max(Math.floor((depth + y_screencenter)*depth_scale), 0);
 		}
 
-		var render_hud = function(){
-				var text = "Depth: " + scaled_depth() + "m";
-				context.font = "bold 15px monospace";
-				context.fillStyle = '#000';
-				context.fillText(text, 7, 17);
-				context.fillStyle = '#ff0';
-				context.fillText(text, 5, 15);
+		var shadowtext = function(text, x, y){
+			context.font = "bold 15px monospace";
+			context.fillStyle = '#000';
+			context.fillText(text, x+2, y+2);
+			context.fillStyle = '#ff0';
+			context.fillText(text, x, y);
+		}
 
-				text = "Life: " + Math.max(player_life, 0);
-				context.font = "bold 15px monospace";
-				context.fillStyle = '#000';
-				context.fillText(text, 7, 34);
-				context.fillStyle = '#ff0';
-				context.fillText(text, 5, 32);
+		var render_hud = function(){
+			shadowtext("Depth: " + scaled_depth() + "m", 5, 15);
+			shadowtext("Life: " + Math.max(player_life, 0), 5, 32);
 		}
 
 		var render = function(){
