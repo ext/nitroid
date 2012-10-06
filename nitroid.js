@@ -50,6 +50,7 @@ var nitroid = new function() {
 		var t = 0;
 		var gameover = false;
 		var is_paused = false;
+		var explosion_length = 0.13; /* in seconds */
 
 		/* camera */
 		var xcam = 0;
@@ -156,6 +157,11 @@ var nitroid = new function() {
 				tile_size: new vector(16, 10),
 				frames: 1
 			},
+			explosion: {
+				tile_start: new vector(538, 256),
+				tile_size: new vector(32, 32),
+				frames: 6
+			},
 
 			/**
 			 * Items
@@ -253,7 +259,7 @@ var nitroid = new function() {
 			animation: animations.missile,
 			damage: 20.0,
 			speed: 9.0,
-			blast: 25.0
+			blast: 45.0
 		},
 		{
 			animation: animations.space_pirate_claw1,
@@ -891,7 +897,7 @@ var nitroid = new function() {
 		}
 
 		var explode_projectile = function(i){
-				projectiles[i].explode = 1.2;
+				projectiles[i].explode = explosion_length;
 				var blast = projectile_types[projectiles[i].type].blast;
 				sx = Math.ceil(blast / horizontal_tiles);
 				sy = Math.ceil(blast / vertical_tiles);
@@ -914,7 +920,7 @@ var nitroid = new function() {
 				var p = projectiles[i];
 				if(projectiles[i].explode > 0) {
 					projectiles[i].explode -= dt;
-					if(projectiles[i].explode < 1.0) {
+					if(projectiles[i].explode < 0.0) {
 						//Despawn
 						projectiles.splice(i, 1);
 					}
@@ -1245,9 +1251,10 @@ var nitroid = new function() {
 				context.translate(projectiles[i].pos.x * tile_width, (projectiles[i].pos.y  - depth + y_screencenter)  * tile_height);
 				if(projectiles[i].explode > 0) {
 					var blast = projectile_types[projectiles[i].type].blast;
-					var phase = Math.floor(Math.sin(projectiles[i].explode * 35) * 127 + 127);
-					context.fillStyle = 'rgb(255,'+phase+',0)';
-					context.fillRect(-blast * 0.5, -blast * 0.5, blast, blast);
+					var s = 1.0 - projectiles[i].explode / explosion_length;
+					var frame = Math.floor(s * animations.explosion.frames);
+					context.scale(blast / animations.explosion.tile_size.x, blast / animations.explosion.tile_size.y);
+					render_animation({ animation: animations.explosion, frame: frame, facing: 1, blink: 0.0});
 				} else {
 					context.rotate(projectiles[i].rotation);
 					render_animation({ animation: projectile_types[projectiles[i].type].animation, frame: projectiles[i].frame, facing: 1, blink: 0.0});
