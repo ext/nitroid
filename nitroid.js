@@ -15,7 +15,7 @@ var nitroid = new function() {
 		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
 		var bomb_blast = new vector(55,55);
 		var bomb_dmg = 250;            /* bomb damage */
-		var depth_spawn_resource_factor = 1.0; /* Number to multiply depth with to get spawn resources */1.0; /* Number to multiply depth with to get spawn resources */
+		var depth_spawn_resource_factor = 1.0; /* Number to multiply depth with to get spawn resources */
 		var hiscore_url = null;
 		var hiscore_user = null;
 
