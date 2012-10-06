@@ -742,13 +742,13 @@ var nitroid = new function() {
 					new_pos -= player_speed * dt;
 					player_horizontal_direction = -1;
 					player_animation.facing = -1;
-					player_animation.frame += animation_df;
+					player_animation.frame += animation_df * 1.8;
 				}
 				if ( key[KEY_RIGHT] )	{
 					new_pos += player_speed * dt;
 					player_horizontal_direction = 1;
 					player_animation.facing = 1;
-					player_animation.frame += animation_df;
+					player_animation.frame += animation_df * 1.8;
 				}
 
 				if ( !player_collision_test(new_pos, depth-1e-9) && new_pos >= 0 && new_pos <= (map_width - player_width/tile_width) ){
