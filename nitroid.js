@@ -142,6 +142,16 @@ var nitroid = new function() {
 				tile_size: new vector(16, 10),
 				frames: 1
 			},
+			healthpack: {
+				tile_start: new vector(538, 226),
+				tile_size: new vector(16, 16),
+				frames: 1
+			},
+
+			/**
+			 * Enemy animations
+			 */
+
 			enemy_walker1: {
 				tile_start: new vector(552, 70),
 				tile_size: new vector(24, 18),
