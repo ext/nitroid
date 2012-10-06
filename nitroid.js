@@ -273,6 +273,14 @@ var nitroid = new function() {
 					 e.last_turn = t;
 					}
 			}
+
+			/* gravitation for enemies */
+			var new_pos = new vector(e.position.x, e.position.y + gravity * dt);
+			if ( map_end > Math.floor(new_pos.y) && !enemy_collision_test(e, new_pos) ){
+				e.position.y = new_pos.y;
+			} else {
+				e.position.y = Math.floor(new_pos.y);
+			}
 		}
 
 		var enemy_shooter = function(e, fire_rate) {
