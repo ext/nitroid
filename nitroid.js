@@ -1176,7 +1176,7 @@ var nitroid = new function() {
 				context.fillStyle = '#ff0';
 				context.fillText(text, 5, 15);
 
-				text = "Life: " + player_life;
+				text = "Life: " + Math.max(player_life, 0);
 				context.font = "bold 15px monospace";
 				context.fillStyle = '#000';
 				context.fillText(text, 7, 34);
