@@ -795,6 +795,7 @@ var nitroid = new function() {
 				bombs.push({
 						pos: new vector(pos, depth),
 						lifespan: bomb_lifespan,
+						exploded: false,
 				});
 		}
 
@@ -856,10 +857,11 @@ var nitroid = new function() {
 		var update_bombs = function(){
 				for ( var i in bombs ){
 						bombs[i].lifespan -= dt;
-						if ( bombs[i].lifespan < 0.0 ){
+						if ( !bombs[i].exploded && bombs[i].lifespan < 0.3 ){
 								var sx = Math.ceil(bomb_blast.x / horizontal_tiles);
 								var sy = Math.ceil(bomb_blast.y / vertical_tiles);
 								var b = bombs[i];
+								b.exploded = true;
 
 								/* destroy tiles */
 								for ( var y = -sy; y < sy; y++ ){
@@ -890,7 +892,8 @@ var nitroid = new function() {
 								if ( aabb_aabb(b.pos, bomb_blast, player_pos(), player_size()) ){
 										damage_player(40);
 								}
-
+						}
+						if ( bombs[i].lifespan < 0.0 ){
 								bombs.splice(i, 1);
 						}
 				}
