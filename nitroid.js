@@ -41,6 +41,7 @@ var nitroid = new function() {
 		var player_height2 = player_height * 0.5;
 		var player_offset  = player_width / tile_width * 0.5;
 		var player_life = 100.0;
+		var player_max_life = 100.0;
 		var enemies_despawn_distance = 10; //distance from screen edge
 		var player_rof = 1000 / 5;
 		var last_fire = 0;
@@ -55,6 +56,7 @@ var nitroid = new function() {
 		var map = [];        /* row, column */
 		var map_end = -1;    /* last cached row */
 		var map_width = 60;  /* width of the map in tiles, can be overridden by user */
+		var items = [];
 
 		//var map_begin = -100; /* first row in cache */
 		var can_jump = 0;              /* number of "steps" the player may jump */
@@ -62,7 +64,6 @@ var nitroid = new function() {
 		var projectiles = [];	/* projectile: pos, velocity, rotation, type, frame, hostile(bool) */
 		var selected_projectile_type = 0;
 		var player_horizontal_direction = 1; /* -1 or 1 (left or right)  */
-
 
 		/* fps control */
 		var fps = 30;
@@ -252,6 +253,15 @@ var nitroid = new function() {
 			blast: 5.0
 		}
 		];
+
+		var item_type = {
+			healthpack: {
+				animation: animations.healthpack,
+				callback: function(){
+					player_life = player_max_life;
+				}
+			},
+		};
 
 		var enemy_animation = function(e) {
 			e.animation_data.frame += animation_df;
@@ -908,6 +918,17 @@ var nitroid = new function() {
 				player_animation.blink -= blink_dt;
 				if(player_animation.blink < 0) player_animation.blink = 0.0;
 			}
+
+			/* grab items */
+			for ( var i in items ){
+				var cur = items[i];
+				var size = cur.type.animation.tile_size;
+				var pos = cur.position.minus(new vector(0, size.y / tile_height / 2));
+				if ( aabb_aabb(player_pos(), player_size(), pos, size) ){
+					cur.type.callback()
+					items.splice(i, 1);
+				}
+			}
 		}
 
 		var update = function(){
@@ -969,6 +990,17 @@ var nitroid = new function() {
 									possible_spawns.splice(s, 1);
 								}
 								++i;
+							}
+
+							/* spawn healthpack */
+							var level = y / platform_height;
+							if ( level % 15 == 0 ){
+								var dx = depth_width(y - 1) - 2
+								var x = wall_width(y - 1, 0) + 1;
+								items.push({
+									position: new vector(x + dx * frand(y * 53.7 + 9943), y-0.5),
+									type: item_type.healthpack,
+								});
 							}
 						}
 
@@ -1064,6 +1096,17 @@ var nitroid = new function() {
 			context.restore();
 		}
 
+		var render_items = function() {
+			for ( var i in items) {
+				var cur = items[i];
+
+				context.save();
+				context.translate(cur.position.x * tile_width, (cur.position.y  - depth + y_screencenter)  * tile_height);
+				render_animation({ animation: cur.type.animation, frame: 1, facing: 1, blink: 0.0});
+				context.restore();
+			}
+		}
+
 		var render_player = function(){
 				/*context.fillStyle = '#f0f';
 				context.fillRect(pos * tile_width - player_width2, y_screencenter * tile_height - player_height, player_width, player_height);*/
@@ -1149,6 +1192,7 @@ var nitroid = new function() {
 				context.save();
 				context.translate(-xcam * tile_width, 0);
 
+				render_items();
 				render_player();
 				render_enemies();
 				render_bombs();
