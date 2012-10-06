@@ -47,6 +47,7 @@ var nitroid = new function() {
 		var last_fire = 0;
 		var t = 0;
 		var gameover = false;
+		var pause = false;
 
 		/* camera */
 		var xcam = 0;
@@ -952,7 +953,7 @@ var nitroid = new function() {
 		var update = function(){
 				t = (new Date().getTime());
 
-				if ( gameover ){
+				if ( gameover || pause ){
 						return;
 				}
 
@@ -1231,6 +1232,14 @@ var nitroid = new function() {
 				if ( code == 87 ) code = KEY_UP;
 				if ( code == 65 ) code = KEY_LEFT;
 				if ( code == 68 ) code = KEY_RIGHT;
+
+				/* toggle pause */
+				if ( String.fromCharCode(code) == 'P' ){
+						if ( state ){
+								pause = !pause;
+						}
+						return true;
+				}
 
 				switch ( code ){
 				case KEY_UP:
