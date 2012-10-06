@@ -156,6 +156,10 @@ var nitroid = new function() {
 				tile_size: new vector(16, 10),
 				frames: 1
 			},
+
+			/**
+			 * Items
+			 */
 			healthpack: {
 				tile_start: new vector(538, 226),
 				tile_size: new vector(16, 16),
@@ -1061,13 +1065,14 @@ var nitroid = new function() {
 								++i;
 							}
 
-							/* spawn healthpack */
+							/* spawn items */
 							var level = y / platform_height;
 							if ( level % 15 == 0 ){
 								var dx = depth_width(y - 1) - 2
 								var x = wall_width(y - 1, 0) + 1;
 								items.push({
 									position: new vector(x + dx * frand(y * 53.7 + 9943), y-0.5),
+									animation_data: { animation: item_type.healthpack.animation, frame: 0, facing: -1, blink: 0.0 },
 									type: item_type.healthpack,
 								});
 							}
@@ -1171,7 +1176,7 @@ var nitroid = new function() {
 
 				context.save();
 				context.translate(cur.position.x * tile_width, (cur.position.y  - depth + y_screencenter)  * tile_height);
-				render_animation({ animation: cur.type.animation, frame: 1, facing: 1, blink: 0.0});
+				render_animation(cur.animation_data);
 				context.restore();
 			}
 		}
