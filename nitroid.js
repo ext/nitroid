@@ -567,7 +567,8 @@ var nitroid = new function() {
 				for(i in enemies) {
 					var e = enemies[i];
 					var size = enemy_types[e.type].animation.tile_size;
-					if(projectile_aabb(p, e.position, size)) {
+					var ep = e.position.minus(new vector(0, size.y / tile_height / 2));
+					if(projectile_aabb(p, ep, size)) {
 						enemies[i].life -= projectile_types[p.type].damage;
 						hit = true;
 					}
@@ -584,7 +585,9 @@ var nitroid = new function() {
 		}
 
 		var player_enemy_collision_test = function(e) {
-			return aabb_aabb(player_pos(), player_size(), e.position, enemy_types[e.type].animation.tile_size);
+			var size = enemy_types[e.type].animation.tile_size;
+			var ep = e.position.minus(new vector(0, size.y / tile_height / 2));
+			return aabb_aabb(player_pos(), player_size(), ep, size);
 		}
 
 		/**
