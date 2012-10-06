@@ -919,7 +919,7 @@ var nitroid = new function() {
 		var update_player = function() {
 			if(player_life <= 0) {
 					gameover = true;
-					$(wrapper).prepend('<div class="gameover"><p>Game Over</p></div>');
+					$(wrapper).prepend('<div class="nitroid_msg"><p>Game Over</p></div>');
 
 					if ( hiscore_url ){
 							$.ajax({
@@ -1237,6 +1237,11 @@ var nitroid = new function() {
 				if ( String.fromCharCode(code) == 'P' ){
 						if ( state ){
 								pause = !pause;
+						}
+						if ( pause ){
+								$(wrapper).prepend('<div class="nitroid_msg"><p>Paused</p></div>');
+						} else {
+								$(wrapper).children('.nitroid_msg').remove();
 						}
 						return true;
 				}
