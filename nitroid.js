@@ -6,16 +6,16 @@ var nitroid = new function() {
 		var animation_tiles = new Image();
 
 		/* parameters */
-		var platform_height = 12;      /* height between platforms */
-		var gravity = 12;               /* player gravity */
-		var player_jump = 25;           /* player jumping height per step */
-		var player_jump_steps = 0.50;      /* how many "steps" a jump is (height = steps * jump) */
-		var player_jump_threshold = 0.25;  /* at what point the jump is floating in air */
-		var player_speed = 5.0;        /* how fast the player moves horizontally */
-		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
+		var platform_height = 12;                /* height between platforms */
+		var gravity = 12;                        /* player gravity */
+		var player_jump = 25;                    /* player jumping height per step */
+		var player_jump_steps = 0.50;            /* how many "steps" a jump is (height = steps * jump) */
+		var player_jump_threshold = 0.25;        /* at what point the jump is floating in air */
+		var player_speed = 5.0;                  /* how fast the player moves horizontally */
+		var bomb_lifespan = 3.0;                 /* how long before a bomb explodes */
 		var bomb_blast = new vector(55,55);
-		var bomb_dmg = 250;            /* bomb damage */
-		var depth_spawn_resource_factor = 1.25; /* Number to multiply depth with to get spawn resources */
+		var bomb_dmg = 250;                      /* bomb damage */
+		var depth_spawn_resource_factor = 1.25;  /* Number to multiply depth with to get spawn resources */
 		var hiscore_url = null;
 		var hiscore_user = null;
 
