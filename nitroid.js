@@ -1438,7 +1438,7 @@ var nitroid = new function() {
 						$(wrapper).prepend('<div class="instructions"></div>');
 						setTimeout(function(){
 								$('.instructions').fadeOut();
-						}, 7000);
+						}, 12000);
 
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
