@@ -42,6 +42,8 @@ var nitroid = new function() {
 		var player_offset  = player_width / tile_width * 0.5;
 		var player_max_life = 100.0;
 		var player_life = player_max_life;
+		var playtime = 0.0;
+		var starttime = 0;
 		var enemies_despawn_distance = 10; //distance from screen edge
 		var player_rof = 1000 / 5;
 		var last_fire = 0;
@@ -941,6 +943,8 @@ var nitroid = new function() {
 		}
 
 		var update_player = function() {
+			playtime += dt;
+
 			if(player_life <= 0) {
 					gameover = true;
 					$(wrapper).prepend('<div class="nitroid_msg"><p>Game Over</p></div>');
@@ -978,9 +982,6 @@ var nitroid = new function() {
 				if ( gameover || is_paused ){
 					return;
 				}
-
-				t = (new Date().getTime());
-
 				update_player();
 				update_player_movement();
 				update_player_gravity();
@@ -1305,8 +1306,20 @@ var nitroid = new function() {
 		}
 
 		var expire = function(){
-				update();
-				render();
+				var sleep;
+
+				do {
+						t += frame_delay;
+						
+						update();
+						render();
+
+						var cur = (new Date().getTime());
+						var delta = (cur-t);
+						sleep = Math.max(frame_delay - delta, 0);
+				} while ( sleep == 0 );
+
+				setTimeout(expire, sleep);
 		};
 
 		return {
@@ -1363,9 +1376,10 @@ var nitroid = new function() {
 						if ( 'hiscore_user' in params ) hiscore_user = params['hiscore_user'];
 
 						/* start game */
-						set_framerate(default_framerate);
-						setInterval(expire, frame_delay);
 						update_map();
+						t = starttime = (new Date().getTime());
+						set_framerate(default_framerate);
+						setTimeout(expire, frame_delay);
 				},
 		};
 }();
