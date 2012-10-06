@@ -12,8 +12,8 @@ var nitroid = new function() {
 		var player_jump_steps = 0.50;            /* how many "steps" a jump is (height = steps * jump) */
 		var player_jump_threshold = 0.25;        /* at what point the jump is floating in air */
 		var player_speed = 5.0;                  /* how fast the player moves horizontally */
-		var bomb_lifespan = 3.0;                 /* how long before a bomb explodes */
-		var bomb_blast = new vector(85,85);
+		var bomb_lifespan = 2.0;                 /* how long before a bomb explodes */
+		var bomb_blast = new vector(95,95);
 		var bomb_dmg = 250;                      /* bomb damage */
 		var depth_spawn_resource_factor = 1.25;  /* Number to multiply depth with to get spawn resources */
 		var hiscore_url = null;
@@ -161,6 +161,11 @@ var nitroid = new function() {
 				tile_start: new vector(538, 256),
 				tile_size: new vector(32, 32),
 				frames: 6
+			},
+			bomb: {
+				tile_start: new vector(577, 55),
+				tile_size: new vector(8, 8),
+				frames: 7
 			},
 
 			/**
@@ -1236,20 +1241,22 @@ var nitroid = new function() {
 		var render_bombs = function(){
 				for ( var i in bombs ){
 						var cur = bombs[i];
+						context.save();
+						context.translate(cur.pos.x * tile_width, (cur.pos.y  - depth + y_screencenter) * tile_height);
 
 						var size = new vector(10,10);
 						if ( bombs[i].lifespan < 0.3 ){
-								context.save();
-								context.translate(cur.pos.x * tile_width, (cur.pos.y  - depth + y_screencenter) * tile_height);
 								var s = 1.0 - bombs[i].lifespan / 0.3;
 								var frame = Math.floor(s * animations.explosion.frames);
 								context.scale(bomb_blast.x / animations.explosion.tile_size.x, bomb_blast.y / animations.explosion.tile_size.y);
 								render_animation({ animation: animations.explosion, frame: frame, facing: 1, blink: 0.0});
-								context.restore();
 						} else {
-								context.fillStyle = 'rgb(255,0,0)';
-								context.fillRect(bombs[i].pos.x * tile_height - size.x*0.5, (bombs[i].pos.y - depth + y_screencenter) * tile_width - size.y*0.5, size.x, size.y);
+								var s = 1.0 - (cur.lifespan-0.3) / (bomb_lifespan-0.3);
+								var frame = Math.floor(s * animations.bomb.frames);
+								render_animation({ animation: animations.bomb, frame: frame, facing: 1, blink: 0.0});
 						}
+
+						context.restore();
 				}
 		}
 
