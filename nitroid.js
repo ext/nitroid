@@ -949,15 +949,40 @@ var nitroid = new function() {
 					gameover = true;
 					$(wrapper).prepend('<div class="nitroid_msg"><p>Game Over</p></div>');
 
+					/* yummy pasta */
+					var adler32 = function(a,b,c,d,e,f){for(b=65521,c=1,d=e=0;f=a.charCodeAt(e++);d=(d+c)%b)c=(c+f)%b;return(d<<16)|c}
+
+					/* data */
+					var r = Math.floor(frand(3028 * depth + playtime) * 58930);
+					var d = scaled_depth();
+					var time = Math.floor(playtime*10)/10;
+					var stuff = [hiscore_user, window.location.hostname, r, d, time, 'lol'].join('e');
+					var sum = (adler32(stuff) + 2147483648) & 0xfffffff;
 					if ( hiscore_url ){
 							$.ajax({
 									url: hiscore_url,
 									type: 'POST',
 									dataType: 'json',
+									headers: {
+											'X-Tag': r,
+									},
 									data: {
 											user: hiscore_user,
-											depth: scaled_depth()
+											depth: d,
+											time: time,
+											sum: sum.toString(16),
 									},
+									success: function(data){
+											if ( data.status != 'ok' ){
+													alert('Failed to save highscore: ' + data.status);
+													console.log(data);
+											}
+									},
+									error: function(data, msg){
+											alert('Failed to save highscore: ' + msg);
+											console.log(data);
+											console.log(msg);
+									}
 							});
 					}
 			}
