@@ -15,7 +15,7 @@ var nitroid = new function() {
 		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
 		var bomb_blast = new vector(55,55);
 		var bomb_dmg = 250;            /* bomb damage */
-		var depth_spawn_resource_factor = 1.0; /* Number to multiply depth with to get spawn resources */
+		var depth_spawn_resource_factor = 1.25; /* Number to multiply depth with to get spawn resources */
 		var hiscore_url = null;
 		var hiscore_user = null;
 
@@ -155,6 +155,11 @@ var nitroid = new function() {
 
 			enemy_walker1: {
 				tile_start: new vector(552, 70),
+				tile_size: new vector(24, 18),
+				frames: 6
+			},
+			enemy_walker2: {
+				tile_start: new vector(552, 92),
 				tile_size: new vector(24, 18),
 				frames: 6
 			},
@@ -362,13 +367,26 @@ var nitroid = new function() {
 
 		var enemy_types = [
 			{
-				/* walker */
+				/* walker 1 */
 				animation: animations.enemy_walker1,
-				spawn_cost: 5,
-				spawn_depth: [0.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
+				spawn_cost: 8,
+				spawn_depth: [0.0, 50.0], /* depth range this enemy occur in, set max to -1 to never limit */
 				life: 20,
 				speed: 2.0,
 				touch_damage: 10.0,
+				run: function(e) { /* e : enemy instance */
+					enemy_animation(e);
+					enemy_walker(e, this.speed);
+				}
+			},
+			{
+				/* walker 2 */
+				animation: animations.enemy_walker2,
+				spawn_cost: 16,
+				spawn_depth: [50.0, -1], /* depth range this enemy occur in, set max to -1 to never limit */
+				life: 20,
+				speed: 2.1,
+				touch_damage: 15.0,
 				run: function(e) { /* e : enemy instance */
 					enemy_animation(e);
 					enemy_walker(e, this.speed);
