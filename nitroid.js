@@ -47,7 +47,7 @@ var nitroid = new function() {
 		var last_fire = 0;
 		var t = 0;
 		var gameover = false;
-		var pause = false;
+		var is_paused = false;
 
 		/* camera */
 		var xcam = 0;
@@ -640,6 +640,19 @@ var nitroid = new function() {
 			);
 		}
 
+		var toggle_pause = function(state){
+			if ( typeof state === "undefined"){
+				state = !is_paused;
+			}
+			is_paused = state;
+
+			if ( is_paused ){
+				$(wrapper).prepend('<div class="nitroid_msg"><p>Paused<br/><small>(press P to continue)</small></p></div>');
+			} else {
+				$(wrapper).children('.nitroid_msg').remove();
+			}
+		}
+
 		var update_player_movement = function(){
 				if (key[KEY_LEFT] || key[KEY_RIGHT]) {
 					if(key[KEY_UP]) {
@@ -951,11 +964,11 @@ var nitroid = new function() {
 		}
 
 		var update = function(){
-				t = (new Date().getTime());
-
-				if ( gameover || pause ){
-						return;
+				if ( gameover || is_paused ){
+					return;
 				}
+
+				t = (new Date().getTime());
 
 				update_player();
 				update_player_movement();
@@ -1235,15 +1248,10 @@ var nitroid = new function() {
 
 				/* toggle pause */
 				if ( String.fromCharCode(code) == 'P' ){
-						if ( state ){
-								pause = !pause;
-						}
-						if ( pause ){
-								$(wrapper).prepend('<div class="nitroid_msg"><p>Paused</p></div>');
-						} else {
-								$(wrapper).children('.nitroid_msg').remove();
-						}
-						return true;
+					if ( state ){
+						toggle_pause();
+					}
+					return true;
 				}
 
 				switch ( code ){
@@ -1329,6 +1337,10 @@ var nitroid = new function() {
 								.css('width', width)
 								.css('height', height)
 						;
+
+						$(window).focusout(function(){
+							toggle_pause(true);
+						});
 
 						/* instructions */
 						$(wrapper).prepend('<div class="instructions"></div>');
