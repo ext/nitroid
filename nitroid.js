@@ -641,6 +641,7 @@ var nitroid = new function() {
 		}
 
 		var toggle_pause = function(state){
+			if ( gameover ) return;
 			if ( typeof state === "undefined"){
 				state = !is_paused;
 			}
