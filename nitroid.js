@@ -888,7 +888,7 @@ var nitroid = new function() {
 
 								/* hurt player */
 								if ( aabb_aabb(b.pos, bomb_blast, player_pos(), player_size()) ){
-										player_life -= 20;
+										damage_player(40);
 								}
 
 								bombs.splice(i, 1);
