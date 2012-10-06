@@ -263,7 +263,7 @@ var nitroid = new function() {
 			{
 			animation: animations.missile,
 			damage: 20.0,
-			speed: 9.0,
+			speed: 13.0,
 			blast: 45.0
 		},
 		{
