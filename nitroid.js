@@ -7,10 +7,10 @@ var nitroid = new function() {
 
 		/* parameters */
 		var platform_height = 12;      /* height between platforms */
-		var gravity = 8;               /* player gravity */
-		var player_jump = 16;          /* player jumping height per step */
-		var player_jump_steps = 15;    /* how many "steps" a jump is (height = steps * jump) */
-		var player_jump_threshold = 7; /* at what point the jump is floating in air */
+		var gravity = 12;               /* player gravity */
+		var player_jump = 25;          /* player jumping height per step */
+		var player_jump_steps = 0.50;    /* how many "steps" a jump is (height = steps * jump) */
+		var player_jump_threshold = 0.25; /* at what point the jump is floating in air */
 		var player_speed = 5.0;        /* how fast the player moves horizontally */
 		var bomb_lifespan = 3.0;       /* how long before a bomb explodes */
 		var bomb_blast = new vector(55,55);
@@ -730,7 +730,7 @@ var nitroid = new function() {
 						if ( can_jump > player_jump_threshold ){
 								new_depth = Math.max(depth - player_jump * dt, depth_min);
 						}
-						can_jump--;
+						can_jump -= 1 * dt;
 				} else {
 						new_depth += gravity * dt;
 				}
