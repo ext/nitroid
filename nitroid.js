@@ -6,7 +6,7 @@ var nitroid = new function() {
 		var animation_tiles = new Image();
 
 		/* parameters */
-		var platform_height = 12;                /* height between platforms */
+		var platform_height = 8;                 /* height between platforms */
 		var gravity = 12;                        /* player gravity */
 		var player_jump = 25;                    /* player jumping height per step */
 		var player_jump_steps = 0.50;            /* how many "steps" a jump is (height = steps * jump) */
@@ -59,7 +59,7 @@ var nitroid = new function() {
 		/* level data */
 		var map = [];        /* row, column */
 		var map_end = -1;    /* last cached row */
-		var map_width = 60;  /* width of the map in tiles, can be overridden by user */
+		var map_width = 50;  /* width of the map in tiles, can be overridden by user */
 		var items = [];
 
 		//var map_begin = -100; /* first row in cache */
