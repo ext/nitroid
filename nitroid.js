@@ -873,18 +873,18 @@ var nitroid = new function() {
 				for ( var i in bombs ){
 						var cur = bombs[i];
 						cur.lifespan -= dt;
-						cur.pos.y += gravity * dt;
-						
-						if ( cur.pos.y >= map_end ){
-							/* outside map, despawn */
-							bombs.splice(i, 1);
-							continue;
-						}
 
-						if ( map[Math.floor(cur.pos.y)][Math.floor(cur.pos.x)] != -1 ){
+						if ( bombs[i].lifespan > 0.3 ){
+							cur.pos.y += gravity * dt;
+							if ( cur.pos.y >= map_end ){
+								/* outside map, despawn */
+								bombs.splice(i, 1);
+								continue;
+							}
+							if ( map[Math.floor(cur.pos.y)][Math.floor(cur.pos.x)] != -1 ){
 								cur.pos.y = Math.floor(cur.pos.y);
-						}
-												
+							}
+						}				
 
 						if ( !bombs[i].exploded && bombs[i].lifespan < 0.3 ){
 								var sx = Math.ceil(bomb_blast.x / horizontal_tiles);
