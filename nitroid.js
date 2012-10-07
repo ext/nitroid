@@ -1497,6 +1497,8 @@ var nitroid = new function() {
 									$('#nitroid_loading').remove();
 									game_begin();
 								}
+							}).error(function(){
+								$('#nitroid_loading p').html('Failed to load ' + filename);
 							}).attr('src', filename);
 						};
 						for ( var i in resources ){
