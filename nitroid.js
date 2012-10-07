@@ -1484,6 +1484,7 @@ var nitroid = new function() {
 						$.extend(hiscore, params.hiscore);
 
 						/* preload graphics */
+						$(wrapper).prepend('<div class="nitroid_center nitroid_error" id="nitroid_loading"><p><b>Nitroid loading</b></p></div>');
 						var resources = [
 							{ filename: 'tileset.png', which: 'tileset' },
 							{ filename: 'animations.png', which: 'sprites' },
@@ -1494,6 +1495,7 @@ var nitroid = new function() {
 							$(new Image()).load(function(){
 								if ( which ){ texture[which] = this; }
 								if ( ++n == resources.length ){
+									$('#nitroid_loading').remove();
 									game_begin();
 								}
 							}).attr('src', filename);
