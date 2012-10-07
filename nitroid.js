@@ -8,6 +8,7 @@ var nitroid = new function() {
 		};
 
 		/* parameters */
+		var prefix = '';                         /* path prefix for resources */
 		var platform_height = 8;                 /* height between platforms */
 		var gravity = 12;                        /* player gravity */
 		var player_jump = 25;                    /* player jumping height per step */
@@ -1406,7 +1407,7 @@ var nitroid = new function() {
 			/* apply background */
 			$(wrapper)
 				.css('background', '#000')
-				.css('background-image', 'url("cave.jpg")')
+				.css('background-image', 'url("'+prefix+'cave.jpg")')
 				.css('background-position', '0 0')
 				.css('width', width)
 				.css('height', height)
@@ -1423,7 +1424,7 @@ var nitroid = new function() {
 			});
 
 			/* instructions */
-			$(wrapper).prepend('<div class="instructions"></div>');
+			$(wrapper).prepend('<div class="instructions" style="background-image: url(\''+prefix+'animations.png\');"></div>');
 			setTimeout(function(){
 				$('.instructions').fadeOut();
 			}, 12000);
@@ -1478,6 +1479,7 @@ var nitroid = new function() {
 						depth = depth_min = -1;
 
 						/* setup parameters */
+						if ( params.prefix ){ prefix = params.prefix; };
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
 						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);
 						$.extend(hiscore, params.hiscore);
@@ -1503,7 +1505,7 @@ var nitroid = new function() {
 						};
 						for ( var i in resources ){
 							var cur = resources[i];
-							load_texture(cur.filename, cur.which);
+							load_texture(prefix + cur.filename, cur.which);
 						}
 				},
 		};
