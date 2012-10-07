@@ -1298,8 +1298,9 @@ var nitroid = new function() {
 		}
 
 		var render_hud = function(){
-			shadowtext("Depth: " + scaled_depth() + "m", 5, 15);
-			shadowtext("Life: " + Math.max(player_life, 0), 5, 32);
+			shadowtext("Player: " + hiscore.username, 5, 15);
+			shadowtext("Depth: " + scaled_depth() + "m", 5, 32);
+			shadowtext("Life: " + Math.max(player_life, 0), 5, 49);
 		}
 
 		var render = function(){
