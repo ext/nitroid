@@ -942,6 +942,13 @@ var nitroid = new function() {
 				} else {
 					p.frame += animation_df;
 					p.pos = p.pos.add(p.velocity.multiply(dt));
+
+					if ( p.pos.y >= map_end ){
+						/* outside map, despawn */
+						projectiles.splice(i, 1);
+						continue;
+					}
+
 					var hit = projectile_entity_collision_test(p)
 					|| collision_test(p.pos.x, p.pos.y,
 														animations.missile.tile_size.x / tile_width,
