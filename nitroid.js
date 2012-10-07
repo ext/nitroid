@@ -957,7 +957,6 @@ var nitroid = new function() {
 			var despawn_depth = depth - y_screencenter - enemies_despawn_distance;
 			for(var i in enemies) {
 				if(enemies[i].life <= 0 || enemies[i].position.y <= despawn_depth) {
-					console.log("Remove enemy at depth " + enemies[i].position.y);
 					enemies.splice(i, 1);
 				} else {
 					if(enemies[i].animation_data.blink > 0.0) {
@@ -1008,13 +1007,10 @@ var nitroid = new function() {
 									success: function(data){
 											if ( data.status != 'ok' ){
 													alert('Failed to save highscore: ' + data.status);
-													console.log(data);
 											}
 									},
 									error: function(data, msg){
 											alert('Failed to save highscore: ' + msg);
-											console.log(data);
-											console.log(msg);
 									}
 							});
 					}
@@ -1031,7 +1027,6 @@ var nitroid = new function() {
 						var cur = items[i];
 
 						if ( cur.position.y <= despawn_depth ){
-								console.log("Remove item at depth " + enemies[i].position.y);
 								items.splice(i, 1);
 								continue;
 						}
@@ -1367,7 +1362,6 @@ var nitroid = new function() {
 						break;
 
 				default:
-						console.log('keypress: ' + code);
 						return false;
 				}
 
