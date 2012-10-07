@@ -801,11 +801,10 @@ var nitroid = new function() {
 		}
 
 		var drop_bomb = function(){
-				var touching_floor = player_collision_test(pos, depth);
-				if ( !touching_floor || bombs.length >= 3 ) return;
+				if ( bombs.length >= 3 ) return;
 
 				bombs.push({
-						pos: new vector(pos, depth),
+						pos: new vector(pos, depth - 0.5),
 						lifespan: bomb_lifespan,
 						exploded: false,
 				});
@@ -872,7 +871,21 @@ var nitroid = new function() {
 
 		var update_bombs = function(){
 				for ( var i in bombs ){
-						bombs[i].lifespan -= dt;
+						var cur = bombs[i];
+						cur.lifespan -= dt;
+						cur.pos.y += gravity * dt;
+						
+						if ( cur.pos.y >= map_end ){
+							/* outside map, despawn */
+							bombs.splice(i, 1);
+							continue;
+						}
+
+						if ( map[Math.floor(cur.pos.y)][Math.floor(cur.pos.x)] != -1 ){
+								cur.pos.y = Math.floor(cur.pos.y);
+						}
+												
+
 						if ( !bombs[i].exploded && bombs[i].lifespan < 0.3 ){
 								var sx = Math.ceil(bomb_blast.x / horizontal_tiles);
 								var sy = Math.ceil(bomb_blast.y / vertical_tiles);
