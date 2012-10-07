@@ -1393,6 +1393,20 @@ var nitroid = new function() {
 				setTimeout(expire, sleep);
 		};
 
+		/* om nom nom, pasta from msdn */
+		// Returns the version of Internet Explorer or a -1
+		// (indicating the use of another browser).
+		function getInternetExplorerVersion(){
+			var rv = -1; // Return value assumes failure.
+			if (navigator.appName == 'Microsoft Internet Explorer'){
+				var ua = navigator.userAgent;
+				var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+				if (re.exec(ua) != null)
+					rv = parseFloat( RegExp.$1 );
+			}
+			return rv;
+		}
+
 		return {
 				init: function(id, params){
 						/* styles */
@@ -1401,6 +1415,13 @@ var nitroid = new function() {
 						height = $this.attr('height');
 						$("<style type='text/css'>.nitroid_center { width: "+width+"px; }</style>").appendTo("head");
 						$("<style type='text/css'>.instructions { left: "+((width-500)/2+$this.offset().left)+"px; }</style>").appendTo("head");
+
+						/* nitroid will not work with < IE9 */
+						var ie = getInternetExplorerVersion();
+						if ( ie != -1 && ie < 9 ){
+							$this.parent().prepend('<div class="nitroid_center nitroid_error"><p><b>Internet Explorer '+ie+'</b></p><p>För att spela Nitroid måste du uppdatera till version IE9 eller senare, eller använda en annan webläsare.</p></div>');
+							return;
+						}
 
 						/* not using jquery since it is significantly slower when it comes to canvas rendering */
 						canvas = document.getElementById(id);

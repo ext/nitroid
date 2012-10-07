@@ -5,6 +5,15 @@
     background: url('animations.png') no-repeat scroll 0px -432px transparent;
 }
 
+.nitroid_error {
+    position: absolute;
+    text-align: center;
+
+    color: #000;
+    background: transparent;
+    font: 2em monospace;
+}
+
 .nitroid_msg {
     position: absolute;
     margin-top: 5em;
