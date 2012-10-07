@@ -10,8 +10,10 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			nitroid.init('nitroid', {
-				'hiscore_url': 'hiscore.php',
-				'hiscore_user': 'sample',
+				hiscore: {
+					url: 'hiscore.php',
+					username: 'anonymous',
+				},
 			});
 		});
 	</script>

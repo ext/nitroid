@@ -16,8 +16,12 @@ var nitroid = new function() {
 		var bomb_blast = new vector(95,95);
 		var bomb_dmg = 250;                      /* bomb damage */
 		var depth_spawn_resource_factor = 1.25;  /* Number to multiply depth with to get spawn resources */
-		var hiscore_url = null;
-		var hiscore_user = null;
+		var hiscore = {
+				url: null,
+				user_id: -1,
+				username: null,
+				data: null,
+		};
 
 		var width = 0;
 		var height = 0;
@@ -980,18 +984,20 @@ var nitroid = new function() {
 					var r = Math.floor(frand(3028 * depth + playtime) * 58930);
 					var d = scaled_depth();
 					var time = Math.floor(playtime*10)/10;
-					var stuff = [hiscore_user, window.location.hostname, r, d, time, 'lol'].join('e');
+					var stuff = [hiscore.user_id, hiscore.username, window.location.hostname, r, d, time, 'lol'].join('e');
 					var sum = (adler32(stuff) + 2147483648) & 0xfffffff;
-					if ( hiscore_url ){
+					if ( hiscore.url ){
 							$.ajax({
-									url: hiscore_url,
+									url: hiscore.url,
 									type: 'POST',
 									dataType: 'json',
 									headers: {
 											'X-Tag': r,
 									},
 									data: {
-											user: hiscore_user,
+											user_id: hiscore.user_id,
+											username: hiscore.username,
+											data: hiscore.user_data,
 											depth: d,
 											time: time,
 											sum: sum.toString(16),
@@ -1468,8 +1474,7 @@ var nitroid = new function() {
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
 						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);
-						if ( 'hiscore_url' in params ) hiscore_url = params['hiscore_url'];
-						if ( 'hiscore_user' in params ) hiscore_user = params['hiscore_user'];
+						$.extend(hiscore, params.hiscore);
 
 						/* start game */
 						update_map();
