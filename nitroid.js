@@ -17,7 +17,7 @@ var nitroid = new function() {
 		var player_speed = 5.0;                  /* how fast the player moves horizontally */
 		var bomb_lifespan = 2.0;                 /* how long before a bomb explodes */
 		var bomb_blast = new vector(95,95);
-		var bomb_dmg = 250;                      /* bomb damage */
+		var bomb_dmg = 80;                      /* bomb damage */
 		var depth_spawn_resource_factor = 1.25;  /* Number to multiply depth with to get spawn resources */
 		var hiscore = {
 				url: null,
@@ -1105,7 +1105,7 @@ var nitroid = new function() {
 								var afford = e.spawn_cost < spawn_resources;
 								var correct_level = e.spawn_depth[0] <= depth && ( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth);
 								if( afford && correct_level ){
-									for(var c = 0; c < e.spawn_cost / enemy_base_value; ++c) possible_spawns.push(e);
+									/*for(var c = 0; c < e.spawn_cost / enemy_base_value; ++c) */possible_spawns.push(e);
 								}
 							}
 							var i = 0;
