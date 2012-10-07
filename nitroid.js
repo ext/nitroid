@@ -876,7 +876,7 @@ var nitroid = new function() {
 
 						if ( bombs[i].lifespan > 0.3 ){
 							cur.pos.y += gravity * dt;
-							if ( cur.pos.y >= map_end ){
+							if ( cur.pos.y >= map_end-1 ){
 								/* outside map, despawn */
 								bombs.splice(i, 1);
 								continue;
@@ -960,7 +960,7 @@ var nitroid = new function() {
 					p.frame += animation_df;
 					p.pos = p.pos.add(p.velocity.multiply(dt));
 
-					if ( p.pos.y >= map_end ){
+					if ( p.pos.y >= map_end-1 ){
 						/* outside map, despawn */
 						projectiles.splice(i, 1);
 						continue;
