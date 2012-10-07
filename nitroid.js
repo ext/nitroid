@@ -1419,7 +1419,7 @@ var nitroid = new function() {
 			for ( var i = 0; i < 255; i++ ){
 				key.push(false);
 			}
-			$(window).focusout(function(){
+			$(document).focusout(function(){
 				toggle_pause(true);
 			});
 
