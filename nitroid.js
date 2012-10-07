@@ -1101,10 +1101,11 @@ var nitroid = new function() {
 							for( var i in enemy_types) {
 								var e = enemy_types[i];
 								e.index = i;
-								if(e.spawn_cost < spawn_resources &&
-									e.spawn_depth[0] <= depth &&
-									( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth)) {
-										for(var c = 0; c < e.spawn_cost / enemy_base_value; ++c) possible_spawns.push(e);
+
+								var afford = e.spawn_cost < spawn_resources;
+								var correct_level = e.spawn_depth[0] <= depth && ( e.spawn_depth[1] == -1 || e.spawn_depth[1] >= depth);
+								if( afford && correct_level ){
+									for(var c = 0; c < e.spawn_cost / enemy_base_value; ++c) possible_spawns.push(e);
 								}
 							}
 							var i = 0;
