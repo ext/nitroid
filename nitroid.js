@@ -681,7 +681,7 @@ var nitroid = new function() {
 			is_paused = state;
 
 			if ( is_paused ){
-				$(wrapper).prepend('<div class="nitroid_msg"><p>Paused<br/><small>(press P to continue)</small></p></div>');
+				$(wrapper).prepend('<div class="nitroid_center nitroid_msg"><p>Paused<br/><small>(press P to continue)</small></p></div>');
 			} else {
 				$(wrapper).children('.nitroid_msg').remove();
 			}
@@ -971,7 +971,7 @@ var nitroid = new function() {
 
 			if(player_life <= 0) {
 					gameover = true;
-					$(wrapper).prepend('<div class="nitroid_msg"><p>Game Over</p></div>');
+					$(wrapper).prepend('<div class="nitroid_center nitroid_msg"><p>Game Over</p></div>');
 
 					/* yummy pasta */
 					var adler32 = function(a,b,c,d,e,f){for(b=65521,c=1,d=e=0;f=a.charCodeAt(e++);d=(d+c)%b)c=(c+f)%b;return(d<<16)|c}
@@ -1395,14 +1395,18 @@ var nitroid = new function() {
 
 		return {
 				init: function(id, params){
+						/* styles */
+						var $this = $('#'+id);
+						width  = $this.attr('width');
+						height = $this.attr('height');
+						$("<style type='text/css'>.nitroid_center { width: "+width+"px; }</style>").appendTo("head");
+						$("<style type='text/css'>.instructions { left: "+((width-500)/2+$this.offset().left)+"px; }</style>").appendTo("head");
+
 						/* not using jquery since it is significantly slower when it comes to canvas rendering */
 						canvas = document.getElementById(id);
 						context = canvas.getContext('2d');
 
 						/* sizes */
-						var $this = $('#'+id);
-						width  = $this.attr('width');
-						height = $this.attr('height');
 						horizontal_tiles = Math.ceil(width / tile_width);
 						vertical_tiles   = Math.ceil(height / tile_height);
 						x_screencenter = Math.floor(horizontal_tiles / 2);

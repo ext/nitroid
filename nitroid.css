@@ -2,16 +2,12 @@
     position: absolute;
     width: 500px;
     height: 157px;
-    left: 250px;
     background: url('animations.png') no-repeat scroll 0px -432px transparent;
 }
 
 .nitroid_msg {
     position: absolute;
-    width: 300px;
-    height: 300px;
-    left: 350px;
-    top: 135px;
+    margin-top: 5em;
     text-align: center;
 }
 
