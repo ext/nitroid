@@ -22,7 +22,7 @@ var nitroid = new function() {
 		var hiscore = {
 				url: null,
 				user_id: -1,
-				username: null,
+				username: 'anonymous',
 				data: null,
 		};
 
