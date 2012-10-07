@@ -1402,6 +1402,29 @@ var nitroid = new function() {
 				setTimeout(expire, sleep);
 		};
 
+		var game_begin = function(){
+			/* apply background */
+			$(wrapper)
+				.css('background', '#000')
+				.css('background-image', 'url("cave.jpg")')
+				.css('background-position', '0 0')
+				.css('width', width)
+				.css('height', height)
+			;
+
+			/* instructions */
+			$(wrapper).prepend('<div class="instructions"></div>');
+			setTimeout(function(){
+				$('.instructions').fadeOut();
+			}, 12000);
+
+			/* start game */
+			update_map();
+			t = starttime = (new Date().getTime());
+			set_framerate(default_framerate);
+			setTimeout(expire, frame_delay);
+		}
+
 		/* om nom nom, pasta from msdn */
 		// Returns the version of Internet Explorer or a -1
 		// (indicating the use of another browser).
@@ -1435,6 +1458,7 @@ var nitroid = new function() {
 						/* not using jquery since it is significantly slower when it comes to canvas rendering */
 						canvas = document.getElementById(id);
 						context = canvas.getContext('2d');
+						wrapper = canvas.parentNode;
 
 						/* sizes */
 						horizontal_tiles = Math.ceil(width / tile_width);
@@ -1450,40 +1474,34 @@ var nitroid = new function() {
 								key.push(false);
 						}
 
-						/* preload graphics */
-						texture.tileset.src = 'tileset.png';
-						texture.sprites.src = 'animations.png';
-
-						/* apply background */
-						wrapper = canvas.parentNode;
-						$(wrapper)
-								.css('background', '#000')
-								.css('background-image', 'url("cave.jpg")')
-								.css('background-position', '0 0')
-								.css('width', width)
-								.css('height', height)
-						;
-
 						$(window).focusout(function(){
 							toggle_pause(true);
 						});
-
-						/* instructions */
-						$(wrapper).prepend('<div class="instructions"></div>');
-						setTimeout(function(){
-								$('.instructions').fadeOut();
-						}, 12000);
 
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
 						if ( 'map_width' in params ) map_width = parseInt(params['map_width']);
 						$.extend(hiscore, params.hiscore);
 
-						/* start game */
-						update_map();
-						t = starttime = (new Date().getTime());
-						set_framerate(default_framerate);
-						setTimeout(expire, frame_delay);
+						/* preload graphics */
+						var resources = [
+							{ filename: 'tileset.png', which: 'tileset' },
+							{ filename: 'animations.png', which: 'sprites' },
+							{ filename: 'cave.jpg' },
+						];
+						var n = 0;
+						var load_texture = function(filename, which){
+							$(new Image()).load(function(){
+								if ( which ){ texture[which] = this; }
+								if ( ++n == resources.length ){
+									game_begin();
+								}
+							}).attr('src', filename);
+						};
+						for ( var i in resources ){
+							var cur = resources[i];
+							load_texture(cur.filename, cur.which);
+						}
 				},
 		};
 }();
