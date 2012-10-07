@@ -2,8 +2,10 @@ var nitroid = new function() {
 		var wrapper = null;
 		var canvas = null;
 		var context = null;
-		var tileset = new Image();
-		var animation_tiles = new Image();
+		var texture = {
+				tileset: new Image(),
+				sprites: new Image(),
+		};
 
 		/* parameters */
 		var platform_height = 8;                 /* height between platforms */
@@ -1183,7 +1185,7 @@ var nitroid = new function() {
 								var sx = (tile % 8) * tile_width;
 								var sy = Math.floor(tile / 8) * tile_height;
 								var px = (x-xoffset) * tile_width;
-								context.drawImage(tileset,
+								context.drawImage(texture.tileset,
 								                  sx, sy,                   /* src */
 								                  tile_width, tile_height,  /* src size */
 								                  px, py,                   /* dst */
@@ -1201,7 +1203,7 @@ var nitroid = new function() {
 			context.save();
 			context.scale(animation_data.facing, 1);
 			context.globalAlpha = Math.abs(1.0 - animation_data.blink);
-			context.drawImage(animation_tiles,
+			context.drawImage(texture.sprites,
 												sx, sy,                   /* src */
 												a.tile_size.x, a.tile_size.y,  /* src size */
 												-a.tile_size.x * 0.5, -a.tile_size.y * 0.5,  /* dst */
@@ -1449,8 +1451,8 @@ var nitroid = new function() {
 						}
 
 						/* preload graphics */
-						tileset.src = 'tileset.png';
-						animation_tiles.src = 'animations.png';
+						texture.tileset.src = 'tileset.png';
+						texture.sprites.src = 'animations.png';
 
 						/* apply background */
 						wrapper = canvas.parentNode;
