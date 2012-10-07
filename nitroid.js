@@ -818,8 +818,8 @@ var nitroid = new function() {
 
 			var hit = projectile_entity_collision_test(p)
 			|| collision_test(p.pos.x, p.pos.y,
-												size.x / tile_width,
-												size.y / tile_height);
+												size.x / tile_width * 0.5,
+												size.y / tile_height * 0.5);
 			if(hit) {
 				explode_projectile(projectiles.length - 1);
 			}
@@ -839,6 +839,10 @@ var nitroid = new function() {
 				hostile: false,
 				explode: 0 /* Not currently exploding */
 			};
+			if ( crouching ){
+				/* hack to shoot down from edge */
+				p.pos.x += player_horizontal_direction * 0.3;
+			}
 			if(key[KEY_UP] && key[KEY_LEFT]) {
 				p.rotation = Math.PI + Math.PI / 4.0;
 				p.velocity = new vector(-1, -1);
