@@ -895,6 +895,7 @@ var nitroid = new function() {
 								/* destroy tiles */
 								for ( var y = -sy; y < sy; y++ ){
 										var py = Math.round(b.pos.y) + y;
+										if ( py >= map_end-1 ) continue;
 										for ( var x = -sx; x < sx; x++ ){
 												var px = Math.round(b.pos.x) + x;
 												var tile = map[py][px];
