@@ -25,6 +25,8 @@ var nitroid = new function() {
 				username: 'anonymous',
 				data: null,
 		};
+		var hiscore_player = null;
+		var hiscore_global = null;
 
 		var width = 0;
 		var height = 0;
@@ -884,7 +886,7 @@ var nitroid = new function() {
 							if ( map[Math.floor(cur.pos.y)][Math.floor(cur.pos.x)] != -1 ){
 								cur.pos.y = Math.floor(cur.pos.y);
 							}
-						}				
+						}
 
 						if ( !bombs[i].exploded && bombs[i].lifespan < 0.3 ){
 								var sx = Math.ceil(bomb_blast.x / horizontal_tiles);
@@ -1002,7 +1004,8 @@ var nitroid = new function() {
 
 			if(player_life <= 0) {
 					gameover = true;
-					$(wrapper).prepend('<div class="nitroid_center nitroid_msg"><p>Game Over</p></div>');
+
+					$(wrapper).prepend('<div class="nitroid_center nitroid_msg" style="height: 100%; background: rgba(0,0,0,0.6);"><p>Game Over</p><p><small>Highscore</small></p><table></table></div>');
 
 					/* yummy pasta */
 					var adler32 = function(a,b,c,d,e,f){for(b=65521,c=1,d=e=0;f=a.charCodeAt(e++);d=(d+c)%b)c=(c+f)%b;return(d<<16)|c}
@@ -1033,6 +1036,15 @@ var nitroid = new function() {
 											if ( data.status != 'ok' ){
 													alert('Failed to save highscore: ' + data.status);
 											}
+											get_hiscore_global(function(){
+													/* nested fugly code but right now i dont care to implement it proper =( */
+													var rows = [];
+													for ( var i in hiscore_global ){
+															var cur = hiscore_global[i];
+															rows.push('<tr><td>' + (cur.username ? cur.username : 'anonymous') + '</td><td>' + cur.score + '</td></tr>');
+													}
+													$('.nitroid_msg table').html(rows.join(''));
+											});
 									},
 									error: function(data, msg){
 											alert('Failed to save highscore: ' + msg);
@@ -1322,9 +1334,18 @@ var nitroid = new function() {
 		}
 
 		var render_hud = function(){
+			context.textAlign="left";
 			shadowtext("Player: " + hiscore.username, 5, 15);
 			shadowtext("Depth: " + scaled_depth() + "m", 5, 32);
 			shadowtext("Energy: " + Math.max(player_life, 0), 5, 49);
+
+			context.textAlign="right";
+			if ( hiscore_global ){
+					shadowtext("highscore: " + hiscore_global[0].score, width - 5, 15);
+			}
+			if ( hiscore_player ){
+					shadowtext("your best: " + hiscore_player, width - 5, 32);
+			}
 		}
 
 		var render = function(){
@@ -1421,6 +1442,54 @@ var nitroid = new function() {
 				} while ( sleep == 0 );
 
 				setTimeout(expire, sleep);
+		};
+
+		var get_hiscore_local = function(){
+				if ( !hiscore.url ) return;
+
+				/* get players highest score */
+				if ( hiscore.user_id != -1 ){
+						$.ajax({
+								url: hiscore.url,
+								type: 'GET',
+								dataType: 'json',
+								data: {
+										user_id: hiscore.user_id,
+										data: hiscore.data,
+								},
+								success: function(data){
+										if ( data.status == 'ok' ){
+												hiscore_player = data.result;
+										}
+								}
+						});
+				}
+		};
+
+		var get_hiscore_global = function(callback=null){
+				/* get global hiscore */
+				$.ajax({
+						url: hiscore.url,
+						type: 'GET',
+						dataType: 'json',
+						success: function(data){
+								if ( data.status == 'ok' ){
+										if ( data.result.length > 0 ){
+												hiscore_global = data.result;
+										} else {
+												hiscore_global = [''];
+										}
+										if ( callback ){
+												callback();
+										}
+								}
+						}
+				});
+		};
+
+		var get_hiscore = function(){
+				get_hiscore_local();
+				get_hiscore_global();
 		};
 
 		var game_begin = function(){
@@ -1527,6 +1596,8 @@ var nitroid = new function() {
 							var cur = resources[i];
 							load_texture(prefix + cur.filename, cur.which);
 						}
+
+						get_hiscore();
 				},
 		};
 }();

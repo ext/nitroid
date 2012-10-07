@@ -16,7 +16,7 @@
 
 .nitroid_msg {
     position: absolute;
-    margin-top: 5em;
+    padding-top: 5em;
     text-align: center;
 }
 
@@ -29,4 +29,24 @@
 
 .nitroid_msg small {
     font-size: 0.4em;
+}
+
+.nitroid_msg table {
+    width: 200px;
+    margin: auto;
+    color: #ff0;
+    font: 1.3em monospace;
+}
+
+.nitroid_msg td:first-child {
+    text-align: left;
+}
+
+.nitroid_msg td:last-child {
+    text-align: right;
+}
+
+.nitroid_msg tr:first-child {
+    font-weight: bold;
+    font-size: 1.2em;
 }
