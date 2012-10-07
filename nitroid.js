@@ -1412,6 +1412,16 @@ var nitroid = new function() {
 				.css('height', height)
 			;
 
+			/* bind keys */
+			$(document).keydown(keypress);
+			$(document).keyup(keyrelease);
+			for ( var i = 0; i < 255; i++ ){
+				key.push(false);
+			}
+			$(window).focusout(function(){
+				toggle_pause(true);
+			});
+
 			/* instructions */
 			$(wrapper).prepend('<div class="instructions"></div>');
 			setTimeout(function(){
@@ -1466,17 +1476,6 @@ var nitroid = new function() {
 						x_screencenter = Math.floor(horizontal_tiles / 2);
 						y_screencenter = Math.floor(vertical_tiles / 2);
 						depth = depth_min = -1;
-
-						/* bind keys */
-						$(document).keydown(keypress);
-						$(document).keyup(keyrelease);
-						for ( var i = 0; i < 255; i++ ){
-								key.push(false);
-						}
-
-						$(window).focusout(function(){
-							toggle_pause(true);
-						});
 
 						/* setup parameters */
 						if ( 'platform_height' in params ) platform_height = parseInt(params['platform_height']);
