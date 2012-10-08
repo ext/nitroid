@@ -1466,7 +1466,7 @@ var nitroid = new function() {
 				}
 		};
 
-		var get_hiscore_global = function(callback=null){
+		var get_hiscore_global = function(callback){
 				/* get global hiscore */
 				$.ajax({
 						url: hiscore.url,
