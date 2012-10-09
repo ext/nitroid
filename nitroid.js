@@ -1432,6 +1432,7 @@ var nitroid = new function() {
 		var expire = function(){
 				var sleep;
 
+				var n = 0;
 				do {
 						t += frame_delay;
 
@@ -1441,6 +1442,11 @@ var nitroid = new function() {
 						var cur = (new Date().getTime());
 						var delta = (cur-t);
 						sleep = Math.max(frame_delay - delta, 0);
+
+						if ( ++n == 5 ){
+								sleep = frame_delay;
+								break;
+						}
 				} while ( sleep == 0 );
 
 				setTimeout(expire, sleep);
