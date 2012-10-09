@@ -1377,6 +1377,8 @@ var nitroid = new function() {
 				if ( code == 87 ) code = KEY_UP;
 				if ( code == 65 ) code = KEY_LEFT;
 				if ( code == 68 ) code = KEY_RIGHT;
+				if ( code == 91 ) code = KEY_ALT; /* fulhack för osx, ⌘ -> alt */
+				if ( code == 9 ) code = KEY_ALT;
 
 				/* toggle pause */
 				if ( String.fromCharCode(code) == 'P' ){
