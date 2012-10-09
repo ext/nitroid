@@ -1,3 +1,12 @@
+function isIOSDevice(){
+    return (
+        //Detect iPhone
+        (navigator.platform.indexOf("iPhone") != -1) ||
+        //Detect iPod
+        (navigator.platform.indexOf("iPod") != -1)
+    );
+}
+
 var nitroid = new function() {
 		var wrapper = null;
 		var canvas = null;
@@ -1380,6 +1389,11 @@ var nitroid = new function() {
 				if ( code == 91 ) code = KEY_ALT; /* fulhack för osx, ⌘ -> alt */
 				if ( code == 9 ) code = KEY_ALT;
 
+				/* fulhack för iphone, J -> shift, K -> ctrl, L -> alt */
+				if ( code == 74 ) code = KEY_DROP;
+				if ( code == 75 ) code = KEY_FIRE;
+				if ( code == 76 ) code = KEY_HOLD;
+
 				/* toggle pause */
 				if ( String.fromCharCode(code) == 'P' ){
 					if ( state ){
@@ -1521,7 +1535,11 @@ var nitroid = new function() {
 			});
 
 			/* instructions */
-			$(wrapper).prepend('<div class="instructions" style="background-image: url(\''+prefix+'animations.png\');"></div>');
+			if(isIOSDevice()) {
+				$(wrapper).prepend('<div class="instructions" style="background-image: url(\''+prefix+'animations_iphone.png\');"></div>');
+			} else {
+				$(wrapper).prepend('<div class="instructions" style="background-image: url(\''+prefix+'animations.png\');"></div>');
+			}
 			setTimeout(function(){
 				$('.instructions').fadeOut();
 			}, 12000);
@@ -1561,6 +1579,12 @@ var nitroid = new function() {
 						if ( ie != -1 && ie < 9 ){
 							$this.parent().prepend('<div class="nitroid_center nitroid_error"><p><b>Internet Explorer '+ie+'</b></p><p>För att spela Nitroid måste du uppdatera till version IE9 eller senare, eller använda en annan webläsare.</p></div>');
 							return;
+						}
+
+						/* add text field for iphone/ipad */
+						if(isIOSDevice()) {
+							$this.parent().append('<input type="text" name="nitroid_input_textbox" style="opacity:0.0;" id="nitroid_input_textbox" />');
+							$('#nitroid_input_textbox').focus();
 						}
 
 						/* not using jquery since it is significantly slower when it comes to canvas rendering */
